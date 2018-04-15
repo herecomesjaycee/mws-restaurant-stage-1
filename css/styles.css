@@ -219,7 +219,7 @@ nav.breadcrumb {
 /* ====================== Restaurant Listing ====================== */
 #restaurants-list {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(1, 1fr);
   background-color: #d6d6d6;
   list-style: outside none none;
   margin: auto;
@@ -506,12 +506,16 @@ nav.breadcrumb {
     grid-template-columns: repeat(3, 1fr);
   }
 
-  #restaurant-list li {
-    margin: 15px;
-    padding: 10px;
+  #restaurants-list {
+    grid-template-columns: repeat(2, 1fr);
+
+    li {
+      margin: 15px;
+      padding: 10px;
+    }
   }
 
-  .inside #maincontent {
+  #restaurant-list .inside #maincontent {
     display: grid;
     grid-template-columns: 50% 50%;
     grid-template-rows: auto auto;
