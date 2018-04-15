@@ -69,10 +69,11 @@ h3,
 h4,
 h5,
 h6,
-p {
+p,
+td {
   font-family: Arial, Helvetica, sans-serif;
   margin: 0 0 20px;
-  font-size: 2em;
+  font-size: 1em;
 }
 
 article,
@@ -405,7 +406,7 @@ nav.breadcrumb {
 }
 
 #reviews-list li > p:nth-child(3) {
-  font-weight: ;
+  font-weight: 900;
 }
 
 #reviews-list li .review-text {
@@ -490,6 +491,17 @@ nav.breadcrumb {
 
 /* large device */
 @media (min-width: 1024px) {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  td {
+    font-size: 1.4em;
+  }
+
   .list-container {
     grid-template-columns: repeat(3, 1fr);
   }
