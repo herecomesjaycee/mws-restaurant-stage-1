@@ -139,14 +139,11 @@ nav h1 a {
   text-transform: uppercase;
 }
 
-#breadcrumb,
 nav.breadcrumb {
-  padding: 10px 20px;
-  list-style: none;
-  background-color: #eee;
-  font-size: 17px;
-  margin: 0;
-  height: 45px;
+  padding: 0.8em 1em;
+  border: 1px solid hsl(0, 0%, 90%);
+  border-radius: 4px;
+  background: #cab9ca;
 }
 
 /* Display list items side by side */
@@ -166,6 +163,7 @@ nav.breadcrumb {
 #breadcrumb li a {
   color: #014681;
   text-decoration: none;
+  margin-left: 1em;
 }
 
 /* Add a color on mouse-over */
@@ -178,6 +176,7 @@ nav.breadcrumb {
   font-weight: 700;
   text-decoration: none;
 }
+
 /* ====================== Map ====================== */
 #map {
   height: 500px;
@@ -243,8 +242,8 @@ nav.breadcrumb {
   margin: 0;
   max-width: 80%;
   min-width: 100%;
-  min-height: 60vh;
-  max-height: 90vh;
+  min-height: 40vh;
+  max-height: 70vh;
   border-radius: 25px 0 25px 0;
   border: 5px dotted orange;
 }
@@ -307,6 +306,9 @@ nav.breadcrumb {
   border: 5px dotted orange;
   max-width: 80%;
   border-radius: 25px 0 25px 0;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #restaurant-address {
