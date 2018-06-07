@@ -25,7 +25,7 @@ self.addEventListener('activate', function(event) {
   );
 });
 
-self.addEventListener("fetch", function(event) {
+self.addEventListener('fetch', function(event) {
     const url = new URL(event.request.url);
 
     if (url.pathname.startsWith("/restaurant.html")) {
@@ -37,10 +37,9 @@ self.addEventListener("fetch", function(event) {
         return;
     }
 
-    if (url.pathname.startsWith("/index.html")){
-        const response = fetch(event.request)
-        updateDB(response);
-    }
+    event.respondWith(
+        updateRestaurantObjs()
+    )
 });
 
 function createDB(){
@@ -49,9 +48,9 @@ function createDB(){
     });
 }
 
-function updateDB(restaurants){
+function updateRestaurantObjs(restaurants){
      idb.open('mws-restaurant', 1).then(db => {
-       const tx = db.transaction('objs', 'readwrite');
+       const tx = db.transaction('restaurants', 'readwrite');
        var obj = {};
        restaurants.forEach(function(restaurant) {
         for (var p in restaurant) {
