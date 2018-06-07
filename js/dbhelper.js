@@ -25,17 +25,17 @@ class DBHelper {
          restaurantDbPromise.then(db => {
            const tx = db.transaction('objs', 'readwrite');
            var obj = {};
-           for (restaurant in restaurants) {
-            for (p in restaurant) {
-              obj[p] = restaurant[p]
+           restaurants.forEach(function(restaurant) {
+            for (var p in restaurant) {
+              obj[p] = restaurant[p];
             }
-             tx.objectStore('objs').put({
-               id: r[i].id,
-               data: obj
-             });
-             return tx.complete;
-           }
-         });
+            tx.objectStore('objs').put({
+              id: restaurant.id,
+              data: obj
+           });
+          return tx.complete;
+          });
+        });
 
          callback(null, restaurants);
        } else { // Oops!. Got an error from server.
