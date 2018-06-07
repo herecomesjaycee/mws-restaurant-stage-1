@@ -21,22 +21,6 @@ class DBHelper {
        if (xhr.status === 200) { // Got a success response from server!
          const json = JSON.parse(xhr.responseText);
          const restaurants = json;
-
-         restaurantDbPromise.then(db => {
-           const tx = db.transaction('objs', 'readwrite');
-           var obj = {};
-           restaurants.forEach(function(restaurant) {
-            for (var p in restaurant) {
-              obj[p] = restaurant[p];
-            }
-            tx.objectStore('objs').put({
-              id: restaurant.id,
-              data: obj
-           });
-          return tx.complete;
-          });
-        });
-
          callback(null, restaurants);
        } else { // Oops!. Got an error from server.
          const error = (`Request failed. Returned status of ${xhr.status}`);
@@ -179,7 +163,7 @@ class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    return `/img/${restaurant.photograph}`;
+    return `/img/${restaurant.photograph}.jpg`;
   }
 
   /**

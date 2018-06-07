@@ -1,11 +1,6 @@
 let restaurants, neighborhoods, cuisines;
 var map;
 var markers = [];
-
-const restaurantDbPromise = idb.open('restaurants-store', 1, upgradeDB => {
-  upgradeDB.createObjectStore('objs', {keyPath: 'id'});
-});
-
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */

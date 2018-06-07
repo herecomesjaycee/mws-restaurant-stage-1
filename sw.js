@@ -1,3 +1,5 @@
+const restaurantDbPromise = '';
+
 self.addEventListener("install", function(event) {
     var urlsToCache = [
         "/",
@@ -17,6 +19,12 @@ self.addEventListener("install", function(event) {
     );
 });
 
+self.addEventListener('activate', function(event) {
+  event.waitUntil(
+    createDB()
+  );
+});
+
 self.addEventListener("fetch", function(event) {
     const url = new URL(event.request.url);
 
@@ -28,4 +36,34 @@ self.addEventListener("fetch", function(event) {
         );
         return;
     }
+
+    if (url.pathname.startsWith("/index.html")){
+        const response = fetch(event.request)
+        updateDB(response);
+    }
 });
+
+function createDB(){
+    idb.open('mws-restaurant', 1, upgradeDB => {
+      upgradeDB.createObjectStore('restaurants', {keyPath: 'id'});
+    });
+}
+
+function updateDB(restaurants){
+     idb.open('mws-restaurant', 1).then(db => {
+       const tx = db.transaction('objs', 'readwrite');
+       var obj = {};
+       restaurants.forEach(function(restaurant) {
+        for (var p in restaurant) {
+          obj[p] = restaurant[p];
+        }
+        tx.objectStore('objs').put({
+          id: restaurant.id,
+          data: obj
+       });
+      return tx.complete;
+      });
+    });
+}
+
+
