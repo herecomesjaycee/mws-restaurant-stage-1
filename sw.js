@@ -1,5 +1,3 @@
-const restaurantDbPromise = '';
-
 self.addEventListener("install", function(event) {
     var urlsToCache = [
         "/",
@@ -19,15 +17,31 @@ self.addEventListener("install", function(event) {
     );
 });
 
-self.addEventListener('activate', function(event) {
-  event.waitUntil(
-    createDB()
-  );
+self.addEventListener("activate", event => {
+    console.log("Activating new service worker...");
+    event.waitUntil(
+        createDB();
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames
+                    .filter(function(cacheName) {
+                        return (
+                            cacheName.startsWith("mws-") &&
+                            cacheName != staticCacheName
+                        );
+                    })
+                    .map(function(cacheName) {
+                        return caches.delete(cacheName);
+                    })
+            ).then(() => {
+                console.log("Service worker active");
+            });
+        });
+    );
 });
-
-self.addEventListener('fetch', function(event) {
+self.addEventListener("fetch", function(event) {
     const url = new URL(event.request.url);
-
+    console.log('hello')''
     if (url.pathname.startsWith("/restaurant.html")) {
         event.respondWith(
             caches
@@ -36,33 +50,10 @@ self.addEventListener('fetch', function(event) {
         );
         return;
     }
-
-    event.respondWith(
-        updateRestaurantObjs()
-    )
 });
 
-function createDB(){
-    idb.open('mws-restaurant', 1, upgradeDB => {
-      upgradeDB.createObjectStore('restaurants', {keyPath: 'id'});
+createDB = () => {
+    idb.open("mws-restaurant", 1, upgradeDB => {
+        upgradeDB.createObjectStore("restaurants", { keyPath: "id" });
     });
-}
-
-function updateRestaurantObjs(restaurants){
-     idb.open('mws-restaurant', 1).then(db => {
-       const tx = db.transaction('restaurants', 'readwrite');
-       var obj = {};
-       restaurants.forEach(function(restaurant) {
-        for (var p in restaurant) {
-          obj[p] = restaurant[p];
-        }
-        tx.objectStore('objs').put({
-          id: restaurant.id,
-          data: obj
-       });
-      return tx.complete;
-      });
-    });
-}
-
-
+};

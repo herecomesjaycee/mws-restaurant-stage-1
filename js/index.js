@@ -1,7 +1,7 @@
 function runServiceWorker() {
   if (!navigator.serviceWorker) return;
   navigator.serviceWorker
-    .register("./js/sw.js")
+    .register("./sw.js")
     .then(function() {
       console.log("Success");
     })

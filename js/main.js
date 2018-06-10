@@ -5,9 +5,24 @@ var markers = [];
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener("DOMContentLoaded", event => {
+  fetchRestaurants();
   fetchNeighborhoods();
   fetchCuisines();
 });
+
+/**
+ * Fetch restaurants and update idb
+ */
+fetchRestaurants = () => {
+  DBHelper.fetchRestaurants((error, restaurants) => {
+    if (error) {
+      // Got an error
+      console.error(error);
+    } else {
+      updateRestaurantObjs(restaurants);
+    }
+  });
+};
 
 /**
  * Fetch all neighborhoods and set their HTML.
@@ -19,7 +34,7 @@ fetchNeighborhoods = () => {
       console.error(error);
     } else {
       self.neighborhoods = neighborhoods;
-      console.log()
+      console.log();
       fillNeighborhoodsHTML();
     }
   });
@@ -180,5 +195,22 @@ addMarkersToMap = (restaurants = self.restaurants) => {
       window.location.href = marker.url;
     });
     self.markers.push(marker);
+  });
+};
+
+updateRestaurantObjs = restaurants => {
+  idb.open("mws-restaurant", 1).then(db => {
+    const tx = db.transaction("restaurants", "readwrite");
+    restaurants.forEach(function(restaurant) {
+      var obj = {};
+      for (var p in restaurant) {
+        obj[p] = restaurant[p];
+      }
+      tx.objectStore("restaurants").put({
+        id: restaurant.id,
+        data: obj
+      });
+      return tx.complete;
+    });
   });
 };
