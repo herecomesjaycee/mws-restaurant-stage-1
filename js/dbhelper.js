@@ -22,6 +22,20 @@ class DBHelper {
         // Got a success response from server!
         const json = JSON.parse(xhr.responseText);
         const restaurants = json;
+        idb.open("mws-restaurant", 1).then(db => {
+          const tx = db.transaction("restaurants", "readwrite");
+          restaurants.forEach(function(restaurant) {
+            var obj = {};
+            for (var p in restaurant) {
+              obj[p] = restaurant[p];
+            }
+            tx.objectStore("restaurants").put({
+              id: restaurant.id,
+              data: obj
+            });
+            return tx.complete;
+          });
+        });
         callback(null, restaurants);
       } else {
         // Oops!. Got an error from server.

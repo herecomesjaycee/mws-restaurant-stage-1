@@ -5,7 +5,7 @@ var markers = [];
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener("DOMContentLoaded", event => {
-  fetchRestaurants();
+  // fetchRestaurants();
   fetchNeighborhoods();
   fetchCuisines();
 });
@@ -20,6 +20,7 @@ fetchRestaurants = () => {
       console.error(error);
     } else {
       updateRestaurantObjs(restaurants);
+      self.restaurants = restaurants;
     }
   });
 };
@@ -34,7 +35,6 @@ fetchNeighborhoods = () => {
       console.error(error);
     } else {
       self.neighborhoods = neighborhoods;
-      console.log();
       fillNeighborhoodsHTML();
     }
   });
@@ -198,19 +198,21 @@ addMarkersToMap = (restaurants = self.restaurants) => {
   });
 };
 
-updateRestaurantObjs = restaurants => {
-  idb.open("mws-restaurant", 1).then(db => {
-    const tx = db.transaction("restaurants", "readwrite");
-    restaurants.forEach(function(restaurant) {
-      var obj = {};
-      for (var p in restaurant) {
-        obj[p] = restaurant[p];
-      }
-      tx.objectStore("restaurants").put({
-        id: restaurant.id,
-        data: obj
-      });
-      return tx.complete;
-    });
-  });
-};
+// updateRestaurantObjs = restaurants => {
+//   idb.open("mws-restaurant", 1).then(db => {
+//     const tx = db.transaction("restaurants", "readwrite");
+//     restaurants.forEach(function(restaurant) {
+//       var obj = {};
+//       for (var p in restaurant) {
+//         obj[p] = restaurant[p];
+//       }
+//       tx.objectStore("restaurants").put({
+//         id: restaurant.id,
+//         data: obj
+//       });
+//       return tx.complete;
+//     });
+//   });
+// };
+
+

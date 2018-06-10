@@ -20,7 +20,6 @@ self.addEventListener("install", function(event) {
 self.addEventListener("activate", event => {
     console.log("Activating new service worker...");
     event.waitUntil(
-        createDB();
         caches.keys().then(cacheNames => {
             return Promise.all(
                 cacheNames
@@ -51,9 +50,3 @@ self.addEventListener("fetch", function(event) {
         return;
     }
 });
-
-createDB = () => {
-    idb.open("mws-restaurant", 1, upgradeDB => {
-        upgradeDB.createObjectStore("restaurants", { keyPath: "id" });
-    });
-};
