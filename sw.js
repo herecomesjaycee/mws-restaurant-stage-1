@@ -1,19 +1,16 @@
 self.addEventListener("install", function(event) {
     var urlsToCache = [
         "/",
+        "/js/idb.js",
         "/js/dbhelper.js",
         "/js/index.js",
         "/js/main.js",
         "/js/restaurant_info.js",
-        // "/data/restaurants.json",
         "/css/styles.css",
         "/index.html",
         "/restaurant.html"
     ];
     event.waitUntil(
-        idb.open("mws-restaurant", 1, upgradeDB => {
-            upgradeDB.createObjectStore("restaurants", { keyPath: "id" });
-        });
         caches.open("restaurant-static").then(function(cache) {
             return cache.addAll(urlsToCache);
         })
@@ -42,13 +39,9 @@ self.addEventListener("activate", event => {
     );
 });
 self.addEventListener("fetch", function(event) {
-    const url = new URL(event.request.url);
-    if (url.pathname.startsWith("/restaurant.html")) {
-        event.respondWith(
-            caches
-                .match("restaurant.html")
-                .then(response => response || fetch(event.request))
-        );
-        return;
-    }
+    event.respondWith(
+        caches.match(event.request).then(function(response) {
+            return response || fetch(event.request);
+        })
+    );
 });

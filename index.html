@@ -43,6 +43,9 @@
         .register('/sw.js')
         .then(function () {
           console.log("Service Worker Registered");
+          idb.open("mws-restaurant", 1, upgradeDB => {
+              upgradeDB.createObjectStore("restaurants", { keyPath: "id" });
+          })
     });
     }
   </script>
