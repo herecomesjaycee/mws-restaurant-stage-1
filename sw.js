@@ -11,6 +11,9 @@ self.addEventListener("install", function(event) {
         "/restaurant.html"
     ];
     event.waitUntil(
+        idb.open("mws-restaurant", 1, upgradeDB => {
+            upgradeDB.createObjectStore("restaurants", { keyPath: "id" });
+        });
         caches.open("restaurant-static").then(function(cache) {
             return cache.addAll(urlsToCache);
         })
@@ -35,12 +38,11 @@ self.addEventListener("activate", event => {
             ).then(() => {
                 console.log("Service worker active");
             });
-        });
+        })
     );
 });
 self.addEventListener("fetch", function(event) {
     const url = new URL(event.request.url);
-    console.log('hello')''
     if (url.pathname.startsWith("/restaurant.html")) {
         event.respondWith(
             caches

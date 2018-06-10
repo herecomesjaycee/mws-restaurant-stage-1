@@ -29,10 +29,13 @@ li {
 }
 
 a {
-  color: orange;
+  color: #d8d8d8;
   text-decoration: none;
 }
 
+label {
+  color: #fff;
+}
 .skip-link {
   position: absolute;
   top: 10px;
@@ -109,7 +112,7 @@ section {
 
 #footer {
   background-color: #444;
-  color: #aaa;
+  color: #fff;
   font-size: 8pt;
   letter-spacing: 1px;
   padding: 25px;
@@ -267,7 +270,7 @@ nav.breadcrumb {
 #restaurants-list li a {
   background-color: orange;
   /*border-bottom: 3px solid #eee;*/
-  color: #fff;
+  color: #000;
   display: inline-block;
   font-size: 10pt;
   margin: 15px 0 0;

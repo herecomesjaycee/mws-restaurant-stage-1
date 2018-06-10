@@ -25,11 +25,11 @@
       <div class="filter-options">
         <h2>Filter Results</h2>
         <label for="neighborhoods"></label>
-        <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()">
+        <select name="neighborhoods" id="neighborhoods-select" onchange="updateRestaurants()">
           <option value="all">All Neighborhoods</option>
         </select>
         <label for="cuisines"></label>
-        <select id="cuisines-select" name="cuisines" onchange="updateRestaurants()">
+        <select name="cuisines" id="cuisines-select"  onchange="updateRestaurants()">
           <option value="all">All Cuisines</option>
         </select>
       </div>
@@ -43,9 +43,6 @@
         .register('/sw.js')
         .then(function () {
           console.log("Service Worker Registered");
-          const db = idb.open("mws-restaurant", 1, upgradeDB => {
-              upgradeDB.createObjectStore("restaurants", { keyPath: "id" });
-          });
     });
     }
   </script>
