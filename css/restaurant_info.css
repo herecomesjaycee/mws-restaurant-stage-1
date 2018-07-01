@@ -1,0 +1,155 @@
+/* ====================== Restaurant Details ====================== */
+.inside header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.inside #footer {
+  bottom: 0;
+  position: absolute;
+  width: 100%;
+}
+
+#restaurant-name {
+  color: #005959;
+  font-family: Arial, sans-serif;
+  font-size: 20pt;
+  font-weight: 800;
+  letter-spacing: 0.1rem;
+  margin: 15px 0 30px;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+#restaurant-img {
+  border: 5px dotted orange;
+  max-width: 80%;
+  border-radius: 25px 0 25px 0;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#restaurant-address {
+  font-size: 14pt;
+  margin: 10px 0px;
+  font-weight: 500;
+}
+
+#restaurant-cuisine {
+  background-color: #333;
+  color: #ddd;
+  font-size: 12pt;
+  font-weight: 300;
+  letter-spacing: 10px;
+  margin: 0 0 20px;
+  padding: 2px 0;
+  text-align: center;
+  text-transform: uppercase;
+  width: 100%;
+}
+
+#restaurant-container {
+  padding: 10px 20px 30px;
+}
+
+#restaurant-container,
+#reviews-container {
+  width: 100%;
+}
+
+#reviews-container {
+  padding: 30px 20px 80px;
+}
+
+#reviews-container h3 {
+  color: #f58500;
+  font-size: 24pt;
+  font-weight: 300;
+  padding-bottom: 2pt;
+  text-transform: uppercase;
+}
+
+#reviews-list {
+  margin: 0;
+  padding: 0;
+}
+
+#reviews-list li {
+  background-color: #fff;
+  border: 2px solid #d6d6d6;
+  display: block;
+  list-style-type: none;
+  margin: 0 0 50px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  border-radius: 25px 0 25px 0;
+}
+
+#reviews-list li > div,
+#reviews-list li > p {
+  padding: 10px 25px;
+  margin: 0;
+}
+
+#reviews-list li .name-date-wrapper {
+  background-color: #333;
+  overflow: hidden;
+  padding: 30px;
+}
+
+.name-date-wrapper .name {
+  float: left;
+  font-size: 16pt;
+  font-weight: bold;
+  color: #fff;
+  margin: 0;
+}
+
+.name-date-wrapper .date {
+  float: right;
+  font-size: 16pt;
+  color: #fff;
+  margin: 0;
+}
+
+#reviews-list li .rating {
+  font-weight: bold;
+  clear: both;
+  display: inline-block;
+  background-color: #005959;
+  margin: 30px;
+  padding: 10px;
+  color: #fff;
+  font-size: 14pt;
+  border-radius: 5px;
+}
+
+#reviews-list li > p:nth-child(3) {
+  font-weight: 900;
+}
+
+#reviews-list li .review-text {
+  padding: 0 30px 30px;
+  font-size: 14pt;
+  color: #252831;
+}
+
+#restaurant-hours td {
+  color: #000;
+  padding-right: 15px;
+}
+
+/* ========================= Restaurant Page Only ========================= */
+
+.container-restaurant {
+  display: grid;
+  background-color: #d6d6d6;
+}
+
+.inside #maincontent {
+  margin-top: 125px;
+}
