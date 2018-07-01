@@ -8,9 +8,18 @@ class DBHelper {
    */
   static get DATABASE_URL() {
     const port = 1337; // Change this to your server port
-    return `http://localhost:${port}/restaurants/`;
+    return `http://localhost:${port}`;
   }
 
+  static get RESTAURANTS_URL() {
+    const path = "restaurants"; // Change this to your server port
+    return `${DBHelper.DATABASE_URL}/${path}/`;
+  }
+
+  static get REVIEWS_URL() {
+    const path = "reviews"; // Change this to your server port
+    return `${DBHelper.DATABASE_URL}/${path}/`;
+  }
   /**
    * Fetch all restaurants.
    */
@@ -47,7 +56,7 @@ class DBHelper {
     //   }
     // };
     // xhr.send();
-    fetch(DBHelper.DATABASE_URL)
+    fetch(DBHelper.RESTAURANTS_URL)
       .then(function(response) {
         if (response.status !== 200) {
           console.log(
