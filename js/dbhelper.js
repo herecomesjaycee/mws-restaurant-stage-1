@@ -30,7 +30,6 @@ class DBHelper {
           console.log(
             "Looks like there was a problem. Status Code: " + response.status
           );
-          return;
         }
         // Examine the text in the response
         response.json().then(function(data) {
@@ -57,6 +56,7 @@ class DBHelper {
       })
       .catch(function(err) {
         console.log("Fetch Error :-S", err);
+        return db.transaction("mws-restaurant").objectStore("restaurants");
       });
   }
 
@@ -97,6 +97,7 @@ class DBHelper {
       })
       .catch(function(err) {
         console.log("Fetch Error :-S", err);
+        return db.transaction("mws-restaurant").objectStore("reviews");
       });
   }
   /**
