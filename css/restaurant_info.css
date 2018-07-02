@@ -61,7 +61,7 @@
 }
 
 #reviews-container {
-  padding: 30px 20px 80px;
+  padding: 30px 20px;
 }
 
 #reviews-container h3 {
@@ -141,6 +141,10 @@
 #restaurant-hours td {
   color: #000;
   padding-right: 15px;
+}
+
+#new-review-container {
+  padding: 0px 20px 40px;
 }
 
 #review-form label {
