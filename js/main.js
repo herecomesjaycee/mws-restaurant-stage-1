@@ -19,7 +19,6 @@ fetchRestaurants = () => {
       // Got an error
       console.error(error);
     } else {
-      updateRestaurantObjs(restaurants);
       self.restaurants = restaurants;
     }
   });
@@ -165,7 +164,9 @@ createRestaurantHTML = restaurant => {
   li.append(image);
 
   const name = document.createElement("h2");
-  name.innerHTML = restaurant.name;
+  restaurant.is_favorite
+    ? (name.innerHTML = restaurant.name + ` [&hearts;]`)
+    : (name.innerHTML = restaurant.name);
   li.append(name);
 
   const neighborhood = document.createElement("p");
@@ -197,22 +198,3 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     self.markers.push(marker);
   });
 };
-
-// updateRestaurantObjs = restaurants => {
-//   idb.open("mws-restaurant", 1).then(db => {
-//     const tx = db.transaction("restaurants", "readwrite");
-//     restaurants.forEach(function(restaurant) {
-//       var obj = {};
-//       for (var p in restaurant) {
-//         obj[p] = restaurant[p];
-//       }
-//       tx.objectStore("restaurants").put({
-//         id: restaurant.id,
-//         data: obj
-//       });
-//       return tx.complete;
-//     });
-//   });
-// };
-
-

@@ -3,7 +3,7 @@
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta tag="utf-8">
+  <meta tag="utf-8" charset="utf-8">
   <meta name="theme-color" content="#252831"/>
   <!-- Normalize.css for better cross-browser consistency -->
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
@@ -54,6 +54,56 @@
       <ul id="reviews-list"></ul>
     </section>
     <!-- End reviews -->
+    <section id="reviews-container">
+      <h3>Reviews</h3>
+      <div class="new-review-container">
+        <h4>Write A Review</h4>
+
+        <div class="row">
+          <div id="my-review-msg"></div>
+        </div>
+
+        <form id = "review-form" action="http://localhost:1337/reviews" method="post" target="submission.frame">
+          <input type="hidden" id="restaurant_id" name="restaurant_id">
+          <label for="name">Your Name:</label>
+          <br>
+          <input type="text" id="name" name="name" minlength="2">
+          <br>
+          <label for="rating">Rating:</label>
+          <br>
+          <div>
+              <input type="radio" id="1" name="rating" value="1"/>
+              <label for="1">Not great</label>
+          </div>
+          <div>
+              <input type="radio" id="2" name="rating" value="2"/>
+              <label for="2">Below average</label>
+          </div>
+          <div>
+              <input type="radio" id="3" name="rating" value="3"/>
+              <label for="3">Average</label>
+          </div>
+          <div>
+              <input type="radio" id="4" name="rating" value="4"/>
+              <label for="4">Good</label>
+          </div>
+          <div>
+              <input type="radio" id="5" name="rating" value="5" checked/>
+              <label for="5">Great</label>
+          </div>
+          <label for="comment">Comment:</label>
+          <br>
+          <input type="textarea" id="comments" name="comment" rows="3" cols="100" minlength="10" placeholder="Please insert no less than 50 characters">
+          <br>
+          <input type="submit">
+        </form>
+        <iframe name="submission.frame" hidden></iframe>
+      <hr>
+      <ul id="reviews-list" aria-label="Reviews list"></ul>
+    </section>
+    <section id="isFavourite">
+      <button id="favorite_toggle">Favourite this place!</button>
+    </section>
   </main>
   <!-- End main -->
 

@@ -24,38 +24,6 @@ class DBHelper {
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    // let xhr = new XMLHttpRequest();
-    // xhr.open("GET", DBHelper.DATABASE_URL);
-    // xhr.onload = () => {
-    //   if (xhr.status === 200) {
-    //     // Got a success response from server!
-    //     const json = JSON.parse(xhr.responseText);
-    //     const restaurants = json;
-    //     var request = indexedDB.open("mws-restaurant", 1);
-    //     request.onsuccess = function(event) {
-    //       const db = idb.open("mws-restaurant", 1).then(db => {
-    //         const tx = db.transaction("restaurants", "readwrite");
-    //         restaurants.forEach(function(restaurant) {
-    //           var obj = {};
-    //           for (var p in restaurant) {
-    //             obj[p] = restaurant[p];
-    //           }
-    //           tx.objectStore("restaurants").put({
-    //             id: restaurant.id,
-    //             data: obj
-    //           });
-    //           return tx.complete;
-    //         });
-    //       });
-    //     };
-    //     callback(null, restaurants);
-    //   } else {
-    //     // Oops!. Got an error from server.
-    //     const error = `Request failed. Returned status of ${xhr.status}`;
-    //     callback(error, null);
-    //   }
-    // };
-    // xhr.send();
     fetch(DBHelper.RESTAURANTS_URL)
       .then(function(response) {
         if (response.status !== 200) {
@@ -93,6 +61,45 @@ class DBHelper {
   }
 
   /**
+   * Fetch all restaurants.
+   */
+  static fetchReviews(callback) {
+    fetch(DBHelper.REVIEWS_URL)
+      .then(function(response) {
+        if (response.status !== 200) {
+          console.log(
+            "Looks like there was a problem. Status Code: " + response.status
+          );
+          return;
+        }
+        // Examine the text in the response
+        response.json().then(function(data) {
+          const reviews = data;
+          const request = indexedDB.open("mws-restaurant", 1);
+          request.onsuccess = function(event) {
+            const db = idb.open("mws-restaurant", 1).then(db => {
+              const tx = db.transaction("reviews", "readwrite");
+              reviews.forEach(function(review) {
+                let obj = {};
+                for (var p in review) {
+                  obj[p] = review[p];
+                }
+                tx.objectStore("reviews").put({
+                  id: review.id,
+                  data: obj
+                });
+                return tx.complete;
+              });
+            });
+          };
+          callback(null, reviews);
+        });
+      })
+      .catch(function(err) {
+        console.log("Fetch Error :-S", err);
+      });
+  }
+  /**
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
@@ -108,6 +115,29 @@ class DBHelper {
         } else {
           // Restaurant does not exist in the database
           callback("Restaurant does not exist", null);
+        }
+      }
+    });
+  }
+
+  /**
+   * Fetch a restaurant by its ID.
+   */
+  static fetchReviewsByRestaurantId(id, callback) {
+    // fetch all restaurants with proper error handling.
+    DBHelper.fetchReviews((error, reviews) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        const restaurant_reviews = reviews.filter(
+          r => r.restaurant_id == parseInt(id)
+        );
+        if (restaurant_reviews) {
+          // Got the restaurant_reviews
+          callback(null, restaurant_reviews);
+        } else {
+          // Restaurant review(s) does not exist in the database
+          callback("Restaurant review(s) does not exist", null);
         }
       }
     });
@@ -240,5 +270,34 @@ class DBHelper {
       animation: google.maps.Animation.DROP
     });
     return marker;
+  }
+
+  /**
+   * Create user review, send to server and create an object in db
+   * @param {Object} review
+   */
+  static createReview(review) {
+    if (!review) return;
+
+    fetch(`${DBHelper.REST_URL}/reviews`, {
+      method: "POST",
+      body: JSON.stringify(review)
+    })
+      .then(resp => {
+        if (resp.status != 201) {
+          console.log(`response was not successful. Response: ${resp.json()}`);
+        }
+        return resp.json();
+      })
+      .then(rev => {
+        DBHelper.insertReviewInDb(rev, () => {
+          console.log(`server record inserted ${rev.id}`);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        return review;
+      });
+    return review;
   }
 }
