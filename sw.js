@@ -1,4 +1,6 @@
 const staticCacheName = "restaurant-static";
+const staticImgsCache = "restaurant-content-imgs";
+const allCacheNames = [staticCacheName, staticImgsCache];
 
 self.addEventListener("install", function(event) {
     var urlsToCache = [
@@ -28,7 +30,7 @@ self.addEventListener("activate", event => {
                     .filter(function(cacheName) {
                         return (
                             cacheName.startsWith("mws-") &&
-                            cacheName != staticCacheName
+                            !allCacheNames.includes(cacheName)
                         );
                     })
                     .map(function(cacheName) {
@@ -41,6 +43,11 @@ self.addEventListener("activate", event => {
     );
 });
 self.addEventListener("fetch", function(event) {
+    var requestUrl = new URL(event.request.url);
+    if (requestUrl.pathname.startsWith("/img")) {
+        event.respondWith(servePhoto(event.request));
+        return;
+    }
     event.respondWith(
         caches.match(event.request).then(function(response) {
             return response || fetch(event.request);
@@ -50,6 +57,16 @@ self.addEventListener("fetch", function(event) {
 
 self.addEventListener("sync", function(event) {
     if (event.tag == "appSync") {
-        // event.waitUntil();
+        event.waitUntil(DBHelper.syncData());
     }
 });
+
+function servePhoto(request) {
+    var requestUrl = request.url;
+    return caches.open(staticImgsCache).then(function(cache) {
+        return fetch(request).then(function(response) {
+            cache.put(requestUrl, response.clone());
+            return response;
+        });
+    });
+}
