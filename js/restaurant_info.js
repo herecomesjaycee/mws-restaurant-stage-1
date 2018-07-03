@@ -187,3 +187,17 @@ updateFormRestaurantId = restaurant => {
   const el = document.getElementById("restaurant_id");
   el.value = restaurant.id;
 };
+
+postReview = () => {
+  const reviewer_name = document.getElementById("name").value;
+  const rating = document.getElementById("name").value;
+  const comment = document.getElementById("comment").value;
+  const restaurant_id = document.getElementById("restaurant_id").value;
+
+  review = {
+    name: reviewer_name,
+    rating: rating,
+    comment: comment
+  };
+  DBHelper.createReview(review);
+};

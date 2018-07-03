@@ -1,4 +1,4 @@
-const staticCacheName = 'restaurant-static'
+const staticCacheName = "restaurant-static";
 
 self.addEventListener("install", function(event) {
     var urlsToCache = [
@@ -46,4 +46,10 @@ self.addEventListener("fetch", function(event) {
             return response || fetch(event.request);
         })
     );
+});
+
+self.addEventListener("sync", function(event) {
+    if (event.tag == "appSync") {
+        // event.waitUntil();
+    }
 });

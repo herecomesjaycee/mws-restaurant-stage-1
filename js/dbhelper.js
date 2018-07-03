@@ -277,9 +277,8 @@ class DBHelper {
    * Create user review, send to server and create an object in db
    * @param {Object} review
    */
-  static createReview(review) {
+  static createReview(review, callback) {
     if (!review) return;
-
     fetch(`${DBHelper.REST_URL}/reviews`, {
       method: "POST",
       body: JSON.stringify(review)
