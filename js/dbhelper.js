@@ -3,6 +3,30 @@
  */
 class DBHelper {
   /**
+   * Indexed db version
+   */
+  static get DB_VER() {
+    return 1;
+  }
+  /**
+   * Indexed db name
+   */
+  static get DB_NAME() {
+    return "mws-restaurant";
+  }
+  /**
+   * Indexed db store.restaurants
+   */
+  static get RESTAURANTS_STORE() {
+    return "restaurants";
+  }
+  /**
+   * Indexed db store.reviews
+   */
+  static get REVIEWS_STORE() {
+    return "reviews";
+  }
+  /**
    * Database URL.
    * Change this to restaurants.json file location on your server.
    */
@@ -12,48 +36,18 @@ class DBHelper {
   }
 
   static get RESTAURANTS_URL() {
-    const path = "restaurants"; // Change this to your server port
+    const path = DBHelper.RESTAURANTS_STORE; // Change this to your server port
     return `${DBHelper.DATABASE_URL}/${path}/`;
   }
 
   static get REVIEWS_URL() {
-    const path = "reviews"; // Change this to your server port
+    const path = DBHelper.REVIEWS_STORE; // Change this to your server port
     return `${DBHelper.DATABASE_URL}/${path}/`;
-  }
-  /**
-   * Indexed db version
-   */
-  static get DB_VER() {
-    return 1;
-  }
-  /**
-   * Indexed db store
-   */
-  static get DB_STORE() {
-    return "mws-restaurant";
-  }
-  /**
-   * Indexed db store
-   */
-  static get DB_NAME() {
-    return "mws-restaurant";
-  }
-  /**
-   * Indexed db store.restaurants
-   */
-  static get RESTAURANTS_STORE() {
-    return "mws-restaurant";
-  }
-  /**
-   * Indexed db store.reviews
-   */
-  static get REVIEWS_STORE() {
-    return "mws-restaurant";
   }
   /**
    * Get indexed database promise
    */
-  static getDb() {
+  static retrieveDB() {
     return idb.open(DBHelper.DB_NAME, DBHelper.DB_VER, upgrade => {
       const storeRestaurants = upgrade.createObjectStore(
         DBHelper.RESTAURANTS_STORE,
@@ -93,16 +87,19 @@ class DBHelper {
         // Examine the text in the response
         response.json().then(function(data) {
           const restaurants = data;
-          const request = indexedDB.open("mws-restaurant", 1);
+          const request = indexedDB.open(DBHelper.DB_NAME, 1);
           request.onsuccess = function(event) {
-            const db = idb.open("mws-restaurant", 1).then(db => {
-              const tx = db.transaction("restaurants", "readwrite");
+            const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
+              const tx = db.transaction(
+                DBHelper.RESTAURANTS_STORE,
+                "readwrite"
+              );
               restaurants.forEach(function(restaurant) {
                 let obj = {};
                 for (var p in restaurant) {
                   obj[p] = restaurant[p];
                 }
-                tx.objectStore("restaurants").put({
+                tx.objectStore(DBHelper.RESTAURANTS_STORE).put({
                   id: restaurant.id,
                   data: obj
                 });
@@ -115,7 +112,9 @@ class DBHelper {
       })
       .catch(function(err) {
         console.log("Fetch Error :-S", err);
-        return db.transaction("mws-restaurant").objectStore("restaurants");
+        return db
+          .transaction(DBHelper.DB_NAME)
+          .objectStore(DBHelper.RESTAURANTS_STORE);
       });
   }
 
@@ -134,16 +133,16 @@ class DBHelper {
         // Examine the text in the response
         response.json().then(function(data) {
           const reviews = data;
-          const request = indexedDB.open("mws-restaurant", 1);
+          const request = indexedDB.open(DBHelper.DB_NAME, 1);
           request.onsuccess = function(event) {
-            const db = idb.open("mws-restaurant", 1).then(db => {
-              const tx = db.transaction("reviews", "readwrite");
+            const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
+              const tx = db.transaction(DBHelper.REVIEWS_STORE, "readwrite");
               reviews.forEach(function(review) {
                 let obj = {};
                 for (var p in review) {
                   obj[p] = review[p];
                 }
-                tx.objectStore("reviews").put({
+                tx.objectStore(DBHelper.REVIEWS_STORE).put({
                   id: review.id,
                   data: obj
                 });
@@ -156,7 +155,9 @@ class DBHelper {
       })
       .catch(function(err) {
         console.log("Fetch Error :-S", err);
-        return db.transaction("mws-restaurant").objectStore("reviews");
+        return db
+          .transaction(DBHelper.DB_NAME)
+          .objectStore(DBHelper.REVIEWS_STORE);
       });
   }
   /**
@@ -349,9 +350,9 @@ class DBHelper {
       })
       .then(review => {
         request.onsuccess = function(review) {
-          const db = idb.open("mws-restaurant", 1).then(db => {
-            const tx = db.transaction("reviews", "readwrite");
-            tx.objectStore("reviews").put({
+          const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
+            const tx = db.transaction(DBHelper.REVIEWS_STORE, "readwrite");
+            tx.objectStore(DBHelper.REVIEWS_STORE).put({
               id: review.id,
               data: obj
             });
@@ -393,11 +394,11 @@ class DBHelper {
    * @param {Function} callback - callback function, *optional
    */
   static updateRestaurantInDb(restaurant, callback) {
-    DBHelper.getDb().then(db => {
+    DBHelper.retrieveDB().then(db => {
       if (!db) return;
       db
-        .transaction("restaurants", "readwrite")
-        .objectStore("restaurants")
+        .transaction(DBHelper.RESTAURANTS_STORE, "readwrite")
+        .objectStore(DBHelper.RESTAURANTS_STORE)
         .put(restaurant);
       if (typeof callback === "function") callback();
     });
@@ -409,7 +410,7 @@ class DBHelper {
    * @param {Function} callback - callback function, *optional
    */
   static updateRestaurantInDb(restaurant, callback) {
-    DBHelper.getDb().then(db => {
+    DBHelper.retrieveDB().then(db => {
       if (!db) return;
       db
         .transaction(DBHelper.STORE_RESTAURANTS, "readwrite")
@@ -417,5 +418,55 @@ class DBHelper {
         .put(restaurant);
       if (typeof callback === "function") callback();
     });
+  }
+
+  /**
+   * Sync database data (restaurants & reviews)
+   */
+  static syncDataInDb() {
+    // restaurants
+    DBHelper.retrieveDb()
+      .then(db => {
+        if (!db) return;
+
+        return db
+          .transaction(DBHelper.STORE_RESTAURANTS)
+          .objectStore(DBHelper.STORE_RESTAURANTS)
+          .index("pending-updates")
+          .openCursor("yes");
+      })
+      .then(function iterateCursor(cursor) {
+        if (!cursor) return;
+
+        let restaurant = cursor.value;
+        restaurant.pendingUpdate = "no";
+        DBHelper.favoriteRestaurant(restaurant, restaurant.is_favorite);
+
+        return cursor.continue().then(iterateCursor);
+      });
+
+    // reviews
+    DBHelper.retrieveDB()
+      .then(db => {
+        if (!db) return;
+
+        return db
+          .transaction(DBHelper.STORE_REVIEWS)
+          .objectStore(DBHelper.STORE_REVIEWS)
+          .index("pending-updates")
+          .openCursor("yes");
+      })
+      .then(function iterateCursor(cursor) {
+        if (!cursor) return;
+
+        let review = cursor.value;
+
+        DBHelper.deleteReviewFromDb(review.id, () => {
+          review.pendingUpdate = "no";
+          DBHelper.insertReview(review);
+        });
+
+        return cursor.continue().then(iterateCursor);
+      });
   }
 }
