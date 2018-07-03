@@ -195,7 +195,7 @@ updateFormRestaurantId = restaurant => {
  */
 favoriteRestaurant = (restaurant = self.restaurant) => {
   if (restaurant.is_favorite) {
-    DBHelper.favoriteRestaurant(restaurant, true);
+    DBHelper.favoriteRestaurant(restaurant, false);
     fillRestaurantHTML();
   } else {
     DBHelper.favoriteRestaurant(restaurant, true);
