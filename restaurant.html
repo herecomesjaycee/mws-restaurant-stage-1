@@ -55,11 +55,16 @@
       <ul id="reviews-list"></ul>
     </section>
     <!-- End reviews -->
+    <!-- Beginning favourite button -->
+    <section id="favourite">
+      <h3>Like what you see?</h3>
+      <button id="favourite-button" onclick="favoriteRestaurant()">Add this as your favourite!</button>
+    </section>
+    <!-- End reviews -->
+    <!-- Beginning new review -->
     <section id="new-review-container">
       <h3>Submit your review</h3>
-<!--       <form id = "review-form" action="http://localhost:1337/reviews" method="post" target="submission.frame">
- -->
-       <form onsubmit="postReview()" target="submission.frame">
+      <form id = "review-form" action="http://localhost:1337/reviews" method="post" target="submission.frame">
        <input type="hidden" id="restaurant_id" name="restaurant_id">
         <label for="name">Your Name:</label>
         <br>
@@ -100,6 +105,7 @@
     <section id="isFavourite">
       <button id="favorite_toggle">Favourite this place!</button>
     </section>
+    <!-- End new review -->
   </main>
   <!-- End main -->
 

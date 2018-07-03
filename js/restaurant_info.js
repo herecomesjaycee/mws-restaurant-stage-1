@@ -188,6 +188,21 @@ updateFormRestaurantId = restaurant => {
   el.value = restaurant.id;
 };
 
+/**
+ * Favorite/unfavorite restaurant
+ * @param {Object} target - event target
+ * @param {Object} restaurant
+ */
+favoriteRestaurant = (restaurant = self.restaurant) => {
+  if (restaurant.is_favorite) {
+    DBHelper.favoriteRestaurant(restaurant, true);
+    fillRestaurantHTML();
+  } else {
+    DBHelper.favoriteRestaurant(restaurant, true);
+    fillRestaurantHTML();
+  }
+};
+
 postReview = () => {
   const reviewer_name = document.getElementById("name").value;
   const rating = document.getElementById("name").value;
@@ -197,7 +212,8 @@ postReview = () => {
   review = {
     name: reviewer_name,
     rating: rating,
-    comment: comment
+    comment: comment,
+    restaurant_id: restaurant_id
   };
   DBHelper.createReview(review);
 };

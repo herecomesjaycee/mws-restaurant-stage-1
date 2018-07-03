@@ -60,17 +60,29 @@
   width: 100%;
 }
 
-#reviews-container {
+#reviews-container,
+#favourite {
   padding: 30px 20px;
 }
 
 #reviews-container h3,
-#new-review-container h3 {
+#new-review-container h3,
+#favourite h3 {
   color: #f58500;
   font-size: 24pt;
   font-weight: 300;
   padding-bottom: 2pt;
   text-transform: uppercase;
+}
+
+#favourite {
+  background-color: #2f4f4f;
+}
+
+#favourite-button {
+  font-size: 1.2em;
+  padding: 20px;
+  color: #000;
 }
 
 #reviews-list {

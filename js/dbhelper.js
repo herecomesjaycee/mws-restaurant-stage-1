@@ -21,6 +21,65 @@ class DBHelper {
     return `${DBHelper.DATABASE_URL}/${path}/`;
   }
   /**
+   * Indexed db version
+   */
+  static get DB_VER() {
+    return 1;
+  }
+  /**
+   * Indexed db store
+   */
+  static get DB_STORE() {
+    return "mws-restaurant";
+  }
+  /**
+   * Indexed db store
+   */
+  static get DB_NAME() {
+    return "mws-restaurant";
+  }
+  /**
+   * Indexed db store.restaurants
+   */
+  static get RESTAURANTS_STORE() {
+    return "mws-restaurant";
+  }
+  /**
+   * Indexed db store.reviews
+   */
+  static get REVIEWS_STORE() {
+    return "mws-restaurant";
+  }
+  /**
+   * Get indexed database promise
+   */
+  static getDb() {
+    return idb.open(DBHelper.DB_NAME, DBHelper.DB_VER, upgrade => {
+      const storeRestaurants = upgrade.createObjectStore(
+        DBHelper.RESTAURANTS_STORE,
+        {
+          keyPath: "id",
+          autoIncrement: true
+        }
+      );
+      // values for pendingUpdate 'yes', 'no' are used instead of boolean because IndexedDb doesn't support index on boolean column
+      // due to many possible 'falsy' values
+      storeRestaurants.createIndex("pending-updates", "pendingUpdate", {
+        unique: false
+      });
+
+      const storeReviews = upgrade.createObjectStore(DBHelper.REVIEWS_STORE, {
+        keyPath: "id",
+        autoIncrement: true
+      });
+
+      storeReviews.createIndex("pending-updates", "pendingUpdate", {
+        unique: false
+      });
+    });
+  }
+
+  /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
@@ -277,27 +336,86 @@ class DBHelper {
    * Create user review, send to server and create an object in db
    * @param {Object} review
    */
-  static createReview(review, callback) {
+  static createReview(review) {
+    console.log(review);
     if (!review) return;
-    fetch(`${DBHelper.REST_URL}/reviews`, {
-      method: "POST",
+    console.log(`${DBHelper.REVIEWS_URL}`);
+    fetch(`${DBHelper.REVIEWS_URL}`, {
+      method: "post",
       body: JSON.stringify(review)
     })
       .then(resp => {
-        if (resp.status != 201) {
-          console.log(`response was not successful. Response: ${resp.json()}`);
-        }
-        return resp.json();
+        return response.json();
       })
-      .then(rev => {
-        DBHelper.insertReviewInDb(rev, () => {
-          console.log(`server record inserted ${rev.id}`);
-        });
+      .then(review => {
+        request.onsuccess = function(review) {
+          const db = idb.open("mws-restaurant", 1).then(db => {
+            const tx = db.transaction("reviews", "readwrite");
+            tx.objectStore("reviews").put({
+              id: review.id,
+              data: obj
+            });
+            return tx.complete;
+          });
+        };
       })
       .catch(err => {
         console.error(err);
         return review;
       });
     return review;
+  }
+
+  static favoriteRestaurant(restaurant, state) {
+    if (!restaurant || typeof state !== "boolean") return;
+
+    restaurant.is_favorite = state;
+
+    fetch(`${DBHelper.RESTAURANTS_URL}${restaurant.id}/?is_favorite=${state}`, {
+      method: "PUT"
+    })
+      .then(resp => {
+        if (resp.status != 200)
+          console.info(`Response was not successful. Response: ${resp}`);
+        restaurant.pendingUpdate = "no";
+      })
+      .catch(e => {
+        console.log(e);
+        restaurant.pendingUpdate = "yes";
+      });
+
+    DBHelper.updateRestaurantInDb(restaurant);
+  }
+
+  /**
+   * Update idb restaurant record
+   * @param {Object} restaurant
+   * @param {Function} callback - callback function, *optional
+   */
+  static updateRestaurantInDb(restaurant, callback) {
+    DBHelper.getDb().then(db => {
+      if (!db) return;
+      db
+        .transaction("restaurants", "readwrite")
+        .objectStore("restaurants")
+        .put(restaurant);
+      if (typeof callback === "function") callback();
+    });
+  }
+
+  /**
+   * Update idb restaurant record
+   * @param {Object} restaurant
+   * @param {Function} callback - callback function, *optional
+   */
+  static updateRestaurantInDb(restaurant, callback) {
+    DBHelper.getDb().then(db => {
+      if (!db) return;
+      db
+        .transaction(DBHelper.STORE_RESTAURANTS, "readwrite")
+        .objectStore(DBHelper.STORE_RESTAURANTS)
+        .put(restaurant);
+      if (typeof callback === "function") callback();
+    });
   }
 }
