@@ -2,16 +2,17 @@ let restaurants, neighborhoods, cuisines;
 var map;
 var markers = [];
 /**
- * Fetch neighborhoods and cuisines as soon as the page is loaded.
+ * Fetch neighborhoods and cuisines and favourite as soon as the page is loaded.
  */
-document.addEventListener("DOMContentLoaded", event => {
-  // fetchRestaurants();
+window.onload = () => {
+  console.log('window onload');
   fetchNeighborhoods();
   fetchCuisines();
-});
+  fetchFavourites();
+}
 
 /**
- * Fetch restaurants and update idb
+ * Fetch restaurants and set restaurant
  */
 fetchRestaurants = () => {
   DBHelper.fetchRestaurants((error, restaurants) => {
@@ -39,6 +40,18 @@ fetchNeighborhoods = () => {
   });
 };
 
+/**
+ * Declare all favourite option and set their HTML.
+ */
+fetchFavourites = () => {
+  const select = document.getElementById("favourites-select");
+  [true, false].forEach(bool => {
+    const option = document.createElement("option");
+    option.innerHTML = bool;
+    option.value = bool;
+    select.append(option);
+  });
+}
 /**
  * Set neighborhoods HTML.
  */
@@ -103,16 +116,20 @@ window.initMap = () => {
 updateRestaurants = () => {
   const cSelect = document.getElementById("cuisines-select");
   const nSelect = document.getElementById("neighborhoods-select");
+  const fSelect = document.getElementById("favourites-select");
 
   const cIndex = cSelect.selectedIndex;
   const nIndex = nSelect.selectedIndex;
+  const fIndex = fSelect.selectedIndex;
 
   const cuisine = cSelect[cIndex].value;
   const neighborhood = nSelect[nIndex].value;
+  const favourite = fSelect[fIndex].value;
 
-  DBHelper.fetchRestaurantByCuisineAndNeighborhood(
+  DBHelper.fetchRestaurantByCuisineNeighborhoodAndFavourite(
     cuisine,
     neighborhood,
+    favourite,
     (error, restaurants) => {
       if (error) {
         // Got an error!

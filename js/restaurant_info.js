@@ -55,7 +55,12 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById("restaurant-name");
   restaurant.is_favorite
     ? (name.innerHTML = restaurant.name + ` [&hearts;]`)
-    : (name.innerHTML = restaurant.name);
+    : (name.innerHTML = restaurant.name)
+
+  const button = document.getElementById("favourite-button");
+  restaurant.is_favorite
+    ? (button.innerHTML = 'Unfavourite this')
+    : (button.innerHTML = 'Favourite this')
 
   const address = document.getElementById("restaurant-address");
   address.innerHTML = restaurant.address;
@@ -67,6 +72,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
   const cuisine = document.getElementById("restaurant-cuisine");
   cuisine.innerHTML = restaurant.cuisine_type;
+
 
   //update form for resturant id
   updateFormRestaurantId(restaurant);

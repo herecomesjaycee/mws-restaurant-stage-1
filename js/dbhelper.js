@@ -239,9 +239,10 @@ class DBHelper {
   /**
    * Fetch restaurants by a cuisine and a neighborhood with proper error handling.
    */
-  static fetchRestaurantByCuisineAndNeighborhood(
+  static fetchRestaurantByCuisineNeighborhoodAndFavourite(
     cuisine,
     neighborhood,
+    favourite,
     callback
   ) {
     // Fetch all restaurants
@@ -257,6 +258,11 @@ class DBHelper {
         if (neighborhood != "all") {
           // filter by neighborhood
           results = results.filter(r => r.neighborhood == neighborhood);
+        }
+        if (favourite != "all") {
+          //filter by favourite
+          const bool = favourite == 'true' ? true : false
+          results = results.filter(r => r.is_favorite == bool);
         }
         callback(null, results);
       }

@@ -57,7 +57,7 @@ self.addEventListener("fetch", function(event) {
 
 self.addEventListener("sync", function(event) {
     if (event.tag == "appSync") {
-        event.waitUntil(DBHelper.syncData());
+        // event.waitUntil(DBHelper.syncData());
     }
 });
 
