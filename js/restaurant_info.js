@@ -228,4 +228,5 @@ resetReviewForm = () => {
   document.getElementById("review-form").reset();
   document.getElementById("review-notice").innerHTML = 'Thank you for your review!'
   document.getElementById("review-notice").classList.add('review-notice-style')
+  }
 }

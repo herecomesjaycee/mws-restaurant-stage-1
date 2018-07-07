@@ -171,6 +171,10 @@ h1, h2, h3, h4, h5, h6, p, td {
   padding: 0px 20px 40px;
 }
 
+#review-form {
+  padding-top: 1em;
+}
+
 #review-form label {
   color: #000;
   margin: 5px;
@@ -180,10 +184,20 @@ h1, h2, h3, h4, h5, h6, p, td {
 }
 
 #review-form input[type="submit"] {
-  margin-top: 10px;
-  padding: 5px;
-  border-color: #000;
-  background-color: #fff;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding: 0.8em;
+  padding-left: 5em;
+  padding-right: 5em;
+  border-style: hidden;
+  border-radius: 0.6em;
+  font-size: 1em;
+  background-color: white;
+}
+
+#review-form input[type="submit"]:hover{ 
+  transition: all .2s ease-in-out;
+  transform: scale(1.05); 
 }
 
 #review-form input[type="textarea"],
@@ -197,9 +211,13 @@ input[type="text"] {
 
 .review-notice-style{
   margin: inherit;
+  margin-top: 1em;
+  margin-bottom: 1em;
   padding: 1em;
-  color: white;
+  color: #000000;
   background-color: #f58500;
+  border-radius: 0.5em;
+  font-size: 1.2em;
 }
 
 /* ========================= Restaurant Page Only ========================= */

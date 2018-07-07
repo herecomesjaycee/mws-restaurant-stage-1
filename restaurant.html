@@ -55,9 +55,9 @@
       <ul id="reviews-list"></ul>
     </section>
     <!-- End reviews -->
-    <!-- Beginning favourite button -->
+    <!-- Beginning favourite/unfavourite button -->
     <section id="favourite">
-      <button id="favourite-button" onclick="favoriteRestaurant()"></button>
+      <button role="application" aria-label="Add or Remove Restaurant from Favourites" id="favourite-button" onclick="favoriteRestaurant()"></button>
     </section>
     <!-- End reviews -->
     <!-- Beginning new review -->
@@ -68,7 +68,7 @@
        <input type="hidden" id="restaurant_id" name="restaurant_id">
         <label for="name">Your Name:</label>
         <br>
-        <input type="text" id="name" name="name" minlength="2">
+        <input type="text" id="name" name="name" minlength="2" required>
         <br>
         <label for="rating">Rating: </label>
         <br>
@@ -94,7 +94,7 @@
         </div>
         <label for="comment">Comment:</label>
         <br>
-        <input type="textarea" id="comments" name="comment" rows="3" cols="100" minlength="10" placeholder="Please insert no less than 50 characters">
+        <input type="textarea" id="comment" name="comment" rows="3" cols="100" minlength="10" placeholder="Please insert no less than 10 characters" required>
         <br>
         <input type="submit" onclick="return resetReviewForm();">
       </form>
