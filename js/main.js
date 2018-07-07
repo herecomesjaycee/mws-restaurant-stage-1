@@ -47,7 +47,7 @@ fetchFavourites = () => {
   const select = document.getElementById("favourites-select");
   [true, false].forEach(bool => {
     const option = document.createElement("option");
-    option.innerHTML = bool;
+    option.innerHTML = bool == true ? 'Yes' : 'No';
     option.value = bool;
     select.append(option);
   });
