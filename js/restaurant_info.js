@@ -59,8 +59,8 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
   const button = document.getElementById("favourite-button");
   restaurant.is_favorite
-    ? (button.innerHTML = 'Unfavourite this')
-    : (button.innerHTML = 'Favourite this')
+    ? (button.innerHTML = 'Remove from your favourite list')
+    : (button.innerHTML = 'Add to your favourite list')
 
   const address = document.getElementById("restaurant-address");
   address.innerHTML = restaurant.address;

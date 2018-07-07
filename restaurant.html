@@ -57,7 +57,6 @@
     <!-- End reviews -->
     <!-- Beginning favourite button -->
     <section id="favourite">
-      <h3>Like what you see?</h3>
       <button id="favourite-button" onclick="favoriteRestaurant()"></button>
     </section>
     <!-- End reviews -->
@@ -102,9 +101,6 @@
       <hr>
       <ul id="reviews-list" aria-label="Reviews list"></ul>
     </section>
-    <section id="isFavourite">
-      <button id="favorite_toggle">Favourite this place!</button>
-    </section>
     <!-- End new review -->
   </main>
   <!-- End main -->
@@ -116,22 +112,6 @@
   <!-- End footer -->
 
   <!-- Beginning scripts -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then(function () {
-          console.log("Service Worker Registered");
-          idb.open("mws-restaurant", 1, upgradeDB => {
-              upgradeDB.createObjectStore("restaurants", { keyPath: "id" });
-              upgradeDB.createObjectStore("reviews", { keyPath: "id" });
-          })
-      });
-      navigator.serviceWorker.ready.then(function(swRegistration) {
-        return swRegistration.sync.register('appSync');
-      });
-    }
-  </script>
   <!-- Database helpers -->
   <script type="text/javascript" src="js/idb.js"></script>
    <script type="text/javascript" src="js/dbhelper.js"></script>
