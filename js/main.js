@@ -178,7 +178,13 @@ createRestaurantHTML = restaurant => {
   image.className = "restaurant-img";
   image.alt = `Image of ${restaurant.name}`;
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  li.append(image);
+
+
+  const image_link = document.createElement("a");
+  image_link.id = "link-wrapper";
+  image_link.innerHTML = `<img class=${image.className} src=${image.src} alt=${image.alt}>`
+  image_link.href = DBHelper.urlForRestaurant(restaurant);
+  li.append(image_link);
 
   const name = document.createElement("h2");
   restaurant.is_favorite
@@ -187,14 +193,15 @@ createRestaurantHTML = restaurant => {
   li.append(name);
 
   const neighborhood = document.createElement("p");
-  neighborhood.innerHTML = restaurant.neighborhood;
+  neighborhood.innerHTML = `&#127970 ` + restaurant.neighborhood;
   li.append(neighborhood);
 
   const address = document.createElement("p");
-  address.innerHTML = restaurant.address;
+  address.innerHTML = `&#128205 ` + restaurant.address;
   li.append(address);
 
   const more = document.createElement("a");
+  more.id = 'view-details'
   more.innerHTML = "View Details";
   more.href = DBHelper.urlForRestaurant(restaurant);
   li.append(more);

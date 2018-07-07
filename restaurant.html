@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="background: black;">
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -63,6 +63,7 @@
     <!-- Beginning new review -->
     <section id="new-review-container">
       <h3>Submit your review</h3>
+      <h4 id='review-notice'></h4>
       <form id = "review-form" action="http://localhost:1337/reviews" method="post" target="submission.frame">
        <input type="hidden" id="restaurant_id" name="restaurant_id">
         <label for="name">Your Name:</label>
@@ -95,7 +96,7 @@
         <br>
         <input type="textarea" id="comments" name="comment" rows="3" cols="100" minlength="10" placeholder="Please insert no less than 50 characters">
         <br>
-        <input type="submit">
+        <input type="submit" onclick="return resetReviewForm();">
       </form>
       <iframe name="submission.frame" hidden></iframe>
       <hr>
