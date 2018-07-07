@@ -45,12 +45,10 @@ fetchNeighborhoods = () => {
  */
 fetchFavourites = () => {
   const select = document.getElementById("favourites-select");
-  [true, false].forEach(bool => {
-    const option = document.createElement("option");
-    option.innerHTML = bool == true ? 'Yes' : 'No';
-    option.value = bool;
-    select.append(option);
-  });
+  const option = document.createElement("option");
+  option.innerHTML = 'My favourite';
+  option.value = true;
+  select.append(option);
 }
 /**
  * Set neighborhoods HTML.
