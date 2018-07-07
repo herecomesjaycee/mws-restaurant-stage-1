@@ -55,11 +55,20 @@ self.addEventListener("fetch", function(event) {
     );
 });
 
+
+self.addEventListener('message', event => {
+  if (event.data.action === 'skipWaiting') {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener("sync", function(event) {
     if (event.tag == "appSync") {
         // event.waitUntil(DBHelper.syncData());
     }
 });
+
+
 
 function servePhoto(request) {
     var requestUrl = request.url;

@@ -45,18 +45,20 @@
 
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then(function () {
-          console.log("Service Worker Registered");
-          idb.open("mws-restaurant", 1, upgradeDB => {
-              upgradeDB.createObjectStore("restaurants", { keyPath: "id" });
-              upgradeDB.createObjectStore("reviews", { keyPath: "id" });
-          })
-      });
-      navigator.serviceWorker.ready.then(function(swRegistration) {
-        return swRegistration.sync.register('appSync');
-      });
+      window.addEventListener('load', function() {
+        navigator.serviceWorker
+          .register('/sw.js')
+          .then(function () {
+            console.log("Service Worker Registered");
+            idb.open("mws-restaurant", 1, upgradeDB => {
+                upgradeDB.createObjectStore("restaurants", { keyPath: "id" });
+                upgradeDB.createObjectStore("reviews", { keyPath: "id" });
+            })
+        });
+        navigator.serviceWorker.ready.then(function(swRegistration) {
+          return swRegistration.sync.register('appSync');
+        });
+      })
     }
   </script>
   <script type="application/javascript" charset="utf-8" src="js/idb.js"></script>

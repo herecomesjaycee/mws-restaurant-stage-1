@@ -261,8 +261,7 @@ class DBHelper {
         }
         if (favourite != "all") {
           //filter by favourite
-          const bool = favourite == 'true' ? true : false
-          results = results.filter(r => r.is_favorite == bool);
+          results = results.filter(r => r.is_favorite == favourite || r.is_favorite == favourite.toString());
         }
         callback(null, results);
       }
@@ -390,7 +389,6 @@ class DBHelper {
         console.log(e);
         restaurant.pendingUpdate = "yes";
       });
-
     DBHelper.updateRestaurantInDb(restaurant);
   }
 
