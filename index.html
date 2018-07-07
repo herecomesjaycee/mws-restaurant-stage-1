@@ -50,13 +50,9 @@
           .register('/sw.js')
           .then(function () {
             console.log("Service Worker Registered");
-            idb.open("mws-restaurant", 1, upgradeDB => {
-                upgradeDB.createObjectStore("restaurants", { keyPath: "id" });
-                upgradeDB.createObjectStore("reviews", { keyPath: "id" });
-            })
         });
         navigator.serviceWorker.ready.then(function(swRegistration) {
-          return swRegistration.sync.register('appSync');
+          return swRegistration.sync.register('postReview');
         });
       })
     }

@@ -1,6 +1,26 @@
+self.importScripts("./js/idb.js");
+
 const staticCacheName = "restaurant-static";
 const staticImgsCache = "restaurant-content-imgs";
 const allCacheNames = [staticCacheName, staticImgsCache];
+
+const dbPromise = idb.open("mws-restaurant", 1, upgradeDb => {
+  switch (upgradeDb.oldVersion) {
+    case 0:
+      var restaurantsStore = upgradeDb.createObjectStore("restaurants", {
+        keyPath: "id",
+        autoIncrement: true
+      });
+      var ReviewsStore = upgradeDb.createObjectStore("reviews", {
+        keyPath: "id",
+        autoIncrement: true
+      });
+      var ownReviews = upgradeDb.createObjectStore("ownReviews", {
+        keyPath: "id",
+        autoIncrement: true
+      });
+  }
+});
 
 self.addEventListener("install", function(event) {
     var urlsToCache = [
@@ -62,13 +82,38 @@ self.addEventListener('message', event => {
   }
 });
 
-self.addEventListener("sync", function(event) {
-    if (event.tag == "appSync") {
-        // event.waitUntil(DBHelper.syncData());
+self.addEventListener('sync', event => {
+  if (event.tag === "postReview") {
+    dbPromise
+      .then(db => {
+        return db
+          .transaction("ownReviews")
+          .objectStore("ownReviews")
+          .getAll();
+      })
+      .then(reviews => {
+        const reviewPromises = [];
+        for (const review of reviews) {
+          const { rating, name, comment, restaurant_id, createdAt } = review;
+          reviewPromises.push(
+            postReview({ rating, name, comments, restaurant_id, createdAt })
+          );
+        }
+        return Promise.all(reviewPromises);
+      })
+      .then(reviews => {
+        return dbPromise.then(db => {
+          const tx = db.transaction("ownReviews", "readwrite");
+          tx.objectStore("ownReviews").clear();
+          return tx.complete;
+        });
+      })
+      .catch(e => {
+        console.log(e);
+      });
     }
+  console.log("sync event fired", event);
 });
-
-
 
 function servePhoto(request) {
     var requestUrl = request.url;

@@ -109,6 +109,7 @@ fillRestaurantHoursHTML = (
 
 fillReviewsHTML = (restaurant = self.restaurant) => {
   if (self.restaurant.reviews) {
+    console.log('hi')
     renderReviews(self.restaurant.reviews);
   } else {
     DBHelper.fetchReviewsByRestaurantId(restaurant.id, (error, reviews) => {
@@ -131,7 +132,7 @@ renderReviews = reviewsList => {
 
   if (!reviewsList || (reviewsList && reviewsList.length === 0)) {
     const noReviews = document.createElement("p");
-    noReviews.innerHTML = "No reviews yet! bye bye bye";
+    noReviews.innerHTML = "No reviews yet!";
     ul.appendChild(noReviews);
     return;
   }
@@ -143,6 +144,17 @@ renderReviews = reviewsList => {
   ul.appendChild(fragment);
 };
 /**
+ * Render reviews
+ * @param {object} reviews - a new restaurant review
+ */
+renderReview = review => {
+  // sort reviews by latest
+  const ul = document.getElementById("reviews-list"),
+    fragment = document.createDocumentFragment();
+    fragment.append(createReviewHTML(review));
+    ul.appendChild(fragment);
+};
+/**
  * Create review HTML and add it to the webpage.
  */
 createReviewHTML = review => {
@@ -152,7 +164,7 @@ createReviewHTML = review => {
   li.appendChild(name);
 
   const date = document.createElement("p");
-  date.innerHTML = new Date(review.updatedAt).toDateString();
+  date.innerHTML = new Date(review.createdAt).toDateString();
   li.appendChild(date);
 
   const rating = document.createElement("p");
@@ -211,17 +223,20 @@ favoriteRestaurant = (restaurant = self.restaurant) => {
 
 postReview = () => {
   const reviewer_name = document.getElementById("name").value;
-  const rating = document.getElementById("name").value;
-  const comment = document.getElementById("comment").value;
+  const rating = document.querySelector('input[name="rating"]:checked').value;
+  const comments = document.getElementById("comments").value;
   const restaurant_id = document.getElementById("restaurant_id").value;
 
   review = {
     name: reviewer_name,
-    rating: rating,
-    comment: comment,
-    restaurant_id: restaurant_id
+    rating: parseInt(rating),
+    comments: comments,
+    restaurant_id: parseInt(restaurant_id),
+    createdAt: Date.now()
   };
-  DBHelper.createReview(review);
+  DBHelper.postReview(review);
+  renderReview(review);
+  resetReviewForm();
 };
 
 resetReviewForm = () => {

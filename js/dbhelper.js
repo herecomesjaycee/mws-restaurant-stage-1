@@ -44,6 +44,12 @@ class DBHelper {
     const path = DBHelper.REVIEWS_STORE; // Change this to your server port
     return `${DBHelper.DATABASE_URL}/${path}/`;
   }
+
+  static get RESTAURANT_REVIEWS_URL() {
+    const path = DBHelper.REVIEWS_STORE; // Change this to your server port
+    return `${DBHelper.DATABASE_URL}/${path}/?restaurant_id=`;
+  }
+
   /**
    * Get indexed database promise
    */
@@ -186,21 +192,37 @@ class DBHelper {
    */
   static fetchReviewsByRestaurantId(id, callback) {
     // fetch all restaurants with proper error handling.
-    DBHelper.fetchReviews((error, reviews) => {
-      if (error) {
-        callback(error, null);
-      } else {
-        const restaurant_reviews = reviews.filter(
-          r => r.restaurant_id == parseInt(id)
+    // DBHelper.fetchReviews((error, reviews) => {
+    //   if (error) {
+    //     callback(error, null);
+    //   } else {
+    //     const restaurant_reviews = reviews.filter(
+    //       r => r.restaurant_id == parseInt(id)
+    //     );
+    //     if (restaurant_reviews) {
+    //       // Got the restaurant_reviews
+    //       callback(null, restaurant_reviews);
+    //     } else {
+    //       // Restaurant review(s) does not exist in the database
+    //       callback("Restaurant review(s) does not exist", null);
+    //     }
+    //   }
+    // });
+    fetch(DBHelper.RESTAURANT_REVIEWS_URL + id)
+    .then(function(response) {
+      if (response.status !== 200) {
+        console.log(
+          "Looks like there was a problem. Status Code: " + response.status
         );
-        if (restaurant_reviews) {
-          // Got the restaurant_reviews
-          callback(null, restaurant_reviews);
-        } else {
-          // Restaurant review(s) does not exist in the database
-          callback("Restaurant review(s) does not exist", null);
-        }
       }
+      // Examine the text in the response
+      response.json().then(function(data) {
+        const reviews = data;
+        callback(null, reviews);
+      });
+    })
+    .catch(function(err) {
+      console.log("Fetch Error :-S", err);
     });
   }
 
@@ -342,7 +364,7 @@ class DBHelper {
    * Create user review, send to server and create an object in db
    * @param {Object} review
    */
-  static createReview(review) {
+  static postReview(review) {
     console.log(review);
     if (!review) return;
     console.log(`${DBHelper.REVIEWS_URL}`);
@@ -350,21 +372,19 @@ class DBHelper {
       method: "post",
       body: JSON.stringify(review)
     })
-      .then(resp => {
+      .then(response => {
         return response.json();
       })
-      .then(review => {
-        request.onsuccess = function(review) {
-          const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
-            const tx = db.transaction(DBHelper.REVIEWS_STORE, "readwrite");
-            tx.objectStore(DBHelper.REVIEWS_STORE).put({
-              id: review.id,
-              data: obj
-            });
-            return tx.complete;
-          });
-        };
-      })
+      // .then(review => {
+      //   const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
+      //     const tx = db.transaction(DBHelper.REVIEWS_STORE, "readwrite");
+      //     tx.objectStore(DBHelper.REVIEWS_STORE).put({
+      //       id: review.id,
+      //       data: obj
+      //     });
+      //     return tx.complete;
+      //   });
+      // })
       .catch(err => {
         console.error(err);
         return review;
