@@ -5,11 +5,10 @@ var markers = [];
  * Fetch neighborhoods and cuisines and favourite as soon as the page is loaded.
  */
 window.onload = () => {
-  console.log('window onload');
   fetchNeighborhoods();
   fetchCuisines();
   fetchFavourites();
-}
+};
 
 /**
  * Fetch restaurants and set restaurant
@@ -46,10 +45,10 @@ fetchNeighborhoods = () => {
 fetchFavourites = () => {
   const select = document.getElementById("favourites-select");
   const option = document.createElement("option");
-  option.innerHTML = 'My favourite';
+  option.innerHTML = "My favourite";
   option.value = true;
   select.append(option);
-}
+};
 /**
  * Set neighborhoods HTML.
  */
@@ -174,13 +173,13 @@ createRestaurantHTML = restaurant => {
 
   const image = document.createElement("img");
   image.className = "restaurant-img";
-  image.alt = `Image of ${restaurant.name}`;
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
-
+  image_url = DBHelper.imageUrlForRestaurant(restaurant);
+  image.src = "../img/loading.webp";
+  image.alt = `${restaurant.name} restaurant photo`;
 
   const image_link = document.createElement("a");
   image_link.id = "link-wrapper";
-  image_link.innerHTML = `<img class=${image.className} src=${image.src} alt=${image.alt}>`
+  image_link.innerHTML = `<img class=${image.classList} src=${image.src} data-src=${image_url} alt=${image.alt}>`;
   image_link.href = DBHelper.urlForRestaurant(restaurant);
   li.append(image_link);
 
@@ -199,7 +198,7 @@ createRestaurantHTML = restaurant => {
   li.append(address);
 
   const more = document.createElement("a");
-  more.id = 'view-details'
+  more.id = "view-details";
   more.innerHTML = "View Details";
   more.href = DBHelper.urlForRestaurant(restaurant);
   li.append(more);
@@ -220,3 +219,15 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     self.markers.push(marker);
   });
 };
+
+/** Lazy loading **/
+window.addEventListener(
+  "load",
+  function() {
+    var allimages = document.getElementsByClassName("restaurant-img");
+    for (var i = 0; i < allimages.length; i++) {
+      allimages[i].setAttribute("src", allimages[i].getAttribute("data-src"));
+    }
+  },
+  false
+);
