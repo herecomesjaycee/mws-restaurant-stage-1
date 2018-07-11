@@ -91,30 +91,30 @@ class DBHelper {
           );
         }
         // Examine the text in the response
-        response.json().then(function(data) {
-          const restaurants = data;
-          const request = indexedDB.open(DBHelper.DB_NAME, 1);
-          request.onsuccess = function(event) {
-            const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
-              const tx = db.transaction(
-                DBHelper.RESTAURANTS_STORE,
-                "readwrite"
-              );
-              restaurants.forEach(function(restaurant) {
-                let obj = {};
-                for (var p in restaurant) {
-                  obj[p] = restaurant[p];
-                }
-                tx.objectStore(DBHelper.RESTAURANTS_STORE).put({
-                  id: restaurant.id,
-                  data: obj
-                });
-                return tx.complete;
-              });
-            });
-          };
-          callback(null, restaurants);
-        });
+        // response.json().then(function(data) {
+        //   const restaurants = data;
+        //   const request = indexedDB.open(DBHelper.DB_NAME, 1);
+        //   request.onsuccess = function(event) {
+        //     const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
+        //       const tx = db.transaction(
+        //         DBHelper.RESTAURANTS_STORE,
+        //         "readwrite"
+        //       );
+        //       restaurants.forEach(function(restaurant) {
+        //         let obj = {};
+        //         for (var p in restaurant) {
+        //           obj[p] = restaurant[p];
+        //         }
+        //         tx.objectStore(DBHelper.RESTAURANTS_STORE).put({
+        //           id: restaurant.id,
+        //           data: obj
+        //         });
+        //         return tx.complete;
+        //       });
+        //     });
+        //   };
+        //   callback(null, restaurants);
+        // });
       })
       .catch(function(err) {
         console.log("Fetch Error :-S", err);
@@ -209,21 +209,21 @@ class DBHelper {
     //   }
     // });
     fetch(DBHelper.RESTAURANT_REVIEWS_URL + id)
-    .then(function(response) {
-      if (response.status !== 200) {
-        console.log(
-          "Looks like there was a problem. Status Code: " + response.status
-        );
-      }
-      // Examine the text in the response
-      response.json().then(function(data) {
-        const reviews = data;
-        callback(null, reviews);
+      .then(function(response) {
+        if (response.status !== 200) {
+          console.log(
+            "Looks like there was a problem. Status Code: " + response.status
+          );
+        }
+        // Examine the text in the response
+        response.json().then(function(data) {
+          const reviews = data;
+          callback(null, reviews);
+        });
+      })
+      .catch(function(err) {
+        console.log("Fetch Error :-S", err);
       });
-    })
-    .catch(function(err) {
-      console.log("Fetch Error :-S", err);
-    });
   }
 
   /**
@@ -283,7 +283,11 @@ class DBHelper {
         }
         if (favourite != "all") {
           //filter by favourite
-          results = results.filter(r => r.is_favorite == favourite || r.is_favorite == favourite.toString());
+          results = results.filter(
+            r =>
+              r.is_favorite == favourite ||
+              r.is_favorite == favourite.toString()
+          );
         }
         callback(null, results);
       }
@@ -492,5 +496,55 @@ class DBHelper {
 
         return cursor.continue().then(iterateCursor);
       });
+  }
+
+  /**
+   * Fetch unsynced reviews
+   */
+  static syncOfflineReviews() {
+
+    const db = idb
+      .open(DBHelper.DB_NAME, 1)
+      .then(db => {
+        return db
+          .transaction("reviews")
+          .objectStore("reviews")
+          .getAll();
+      })
+      .then(allObjs => {
+        let unsychedReviews = [];
+              allObjs.forEach(item => {
+                item.reviews.forEach(review => {
+                  if (ownreview.flag) {
+                    unsychedReviews.push(review);
+                    delete review.flag;
+                  }
+                });
+              });
+              unsychedReviews.forEach(item => {
+                const body = {
+                  restaurant_id: item.restaurant_id,
+                  name: item.name,
+                  rating: item.rating,
+                  comments: item.comments,
+                  updatedAt: item.updatedAt
+                };
+                fetch(URL_REVIEWS_ALL, {
+                  method: "post",
+                  headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify(body)
+                }).then(res =>
+                  console.log("review synced with the server", res.json())
+                );
+              });
+            });
+
+      });
+
+    // IDBHelper.readAllIdbData(IDBHelper.dbPromise).then(allObjs => {
+    //
   }
 }

@@ -5,9 +5,21 @@ var markers = [];
  * Fetch neighborhoods and cuisines and favourite as soon as the page is loaded.
  */
 window.onload = () => {
+  loadIDB();
   fetchNeighborhoods();
   fetchCuisines();
   fetchFavourites();
+};
+
+/**
+ * Fetch restaurants and set restaurant
+ */
+loadIDB = () => {
+  idb.open("mws-restaurant-1", 1, upgradeDB => {
+    upgradeDB.createObjectStore("restaurants", { keyPath: "id" });
+    upgradeDB.createObjectStore("reviews", { keyPath: "id" });
+    upgradeDB.createObjectStore("ownReviews");
+  });
 };
 
 /**
