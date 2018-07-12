@@ -91,30 +91,30 @@ class DBHelper {
           );
         }
         // Examine the text in the response
-        // response.json().then(function(data) {
-        //   const restaurants = data;
-        //   const request = indexedDB.open(DBHelper.DB_NAME, 1);
-        //   request.onsuccess = function(event) {
-        //     const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
-        //       const tx = db.transaction(
-        //         DBHelper.RESTAURANTS_STORE,
-        //         "readwrite"
-        //       );
-        //       restaurants.forEach(function(restaurant) {
-        //         let obj = {};
-        //         for (var p in restaurant) {
-        //           obj[p] = restaurant[p];
-        //         }
-        //         tx.objectStore(DBHelper.RESTAURANTS_STORE).put({
-        //           id: restaurant.id,
-        //           data: obj
-        //         });
-        //         return tx.complete;
-        //       });
-        //     });
-        //   };
-        //   callback(null, restaurants);
-        // });
+        response.json().then(function(data) {
+          const restaurants = data;
+          const request = indexedDB.open(DBHelper.DB_NAME, 1);
+          request.onsuccess = function(event) {
+            const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
+              const tx = db.transaction(
+                DBHelper.RESTAURANTS_STORE,
+                "readwrite"
+              );
+              restaurants.forEach(function(restaurant) {
+                let obj = {};
+                for (var p in restaurant) {
+                  obj[p] = restaurant[p];
+                }
+                tx.objectStore(DBHelper.RESTAURANTS_STORE).put({
+                  id: restaurant.id,
+                  data: obj
+                });
+                return tx.complete;
+              });
+            });
+          };
+          callback(null, restaurants);
+        });
       })
       .catch(function(err) {
         console.log("Fetch Error :-S", err);
@@ -124,48 +124,6 @@ class DBHelper {
       });
   }
 
-  /**
-   * Fetch all restaurants.
-   */
-  static fetchReviews(callback) {
-    fetch(DBHelper.REVIEWS_URL)
-      .then(function(response) {
-        if (response.status !== 200) {
-          console.log(
-            "Looks like there was a problem. Status Code: " + response.status
-          );
-          return;
-        }
-        // Examine the text in the response
-        response.json().then(function(data) {
-          const reviews = data;
-          const request = indexedDB.open(DBHelper.DB_NAME, 1);
-          request.onsuccess = function(event) {
-            const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
-              const tx = db.transaction(DBHelper.REVIEWS_STORE, "readwrite");
-              reviews.forEach(function(review) {
-                let obj = {};
-                for (var p in review) {
-                  obj[p] = review[p];
-                }
-                tx.objectStore(DBHelper.REVIEWS_STORE).put({
-                  id: review.id,
-                  data: obj
-                });
-                return tx.complete;
-              });
-            });
-          };
-          callback(null, reviews);
-        });
-      })
-      .catch(function(err) {
-        console.log("Fetch Error :-S", err);
-        return db
-          .transaction(DBHelper.DB_NAME)
-          .objectStore(DBHelper.REVIEWS_STORE);
-      });
-  }
   /**
    * Fetch a restaurant by its ID.
    */
@@ -191,23 +149,6 @@ class DBHelper {
    * Fetch a restaurant by its ID.
    */
   static fetchReviewsByRestaurantId(id, callback) {
-    // fetch all restaurants with proper error handling.
-    // DBHelper.fetchReviews((error, reviews) => {
-    //   if (error) {
-    //     callback(error, null);
-    //   } else {
-    //     const restaurant_reviews = reviews.filter(
-    //       r => r.restaurant_id == parseInt(id)
-    //     );
-    //     if (restaurant_reviews) {
-    //       // Got the restaurant_reviews
-    //       callback(null, restaurant_reviews);
-    //     } else {
-    //       // Restaurant review(s) does not exist in the database
-    //       callback("Restaurant review(s) does not exist", null);
-    //     }
-    //   }
-    // });
     fetch(DBHelper.RESTAURANT_REVIEWS_URL + id)
       .then(function(response) {
         if (response.status !== 200) {
@@ -218,6 +159,20 @@ class DBHelper {
         // Examine the text in the response
         response.json().then(function(data) {
           const reviews = data;
+          const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
+            const tx = db.transaction(DBHelper.REVIEWS_STORE, "readwrite");
+            reviews.forEach(function(review) {
+              let obj = {};
+              for (var p in review) {
+                obj[p] = review[p];
+              }
+              tx.objectStore(DBHelper.REVIEWS_STORE).put({
+                id: review.id,
+                data: obj
+              });
+              return tx.complete;
+            });
+          });
           callback(null, reviews);
         });
       })
@@ -379,16 +334,17 @@ class DBHelper {
       .then(response => {
         return response.json();
       })
-      // .then(review => {
-      //   const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
-      //     const tx = db.transaction(DBHelper.REVIEWS_STORE, "readwrite");
-      //     tx.objectStore(DBHelper.REVIEWS_STORE).put({
-      //       id: review.id,
-      //       data: obj
-      //     });
-      //     return tx.complete;
-      //   });
-      // })
+      .then(review => {
+        review.toBeUpdated = true;
+        const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
+          const tx = db.transaction(DBHelper.REVIEWS_STORE, "readwrite");
+          tx.objectStore(DBHelper.REVIEWS_STORE).put({
+            id: review.id,
+            data: review
+          });
+          return tx.complete;
+        });
+      })
       .catch(err => {
         console.error(err);
         return review;
@@ -414,95 +370,18 @@ class DBHelper {
         restaurant.pendingUpdate = "yes";
       });
     DBHelper.updateRestaurantInDb(restaurant);
-  }
-
-  /**
-   * Update idb restaurant record
-   * @param {Object} restaurant
-   * @param {Function} callback - callback function, *optional
-   */
-  static updateRestaurantInDb(restaurant, callback) {
-    DBHelper.retrieveDB().then(db => {
-      if (!db) return;
-      db
-        .transaction(DBHelper.RESTAURANTS_STORE, "readwrite")
-        .objectStore(DBHelper.RESTAURANTS_STORE)
-        .put(restaurant);
-      if (typeof callback === "function") callback();
-    });
-  }
-
-  /**
-   * Update idb restaurant record
-   * @param {Object} restaurant
-   * @param {Function} callback - callback function, *optional
-   */
-  static updateRestaurantInDb(restaurant, callback) {
-    DBHelper.retrieveDB().then(db => {
-      if (!db) return;
-      db
-        .transaction(DBHelper.STORE_RESTAURANTS, "readwrite")
-        .objectStore(DBHelper.STORE_RESTAURANTS)
-        .put(restaurant);
-      if (typeof callback === "function") callback();
-    });
-  }
-
-  /**
-   * Sync database data (restaurants & reviews)
-   */
-  static syncDataInDb() {
-    // restaurants
-    DBHelper.retrieveDb()
-      .then(db => {
-        if (!db) return;
-
-        return db
-          .transaction(DBHelper.STORE_RESTAURANTS)
-          .objectStore(DBHelper.STORE_RESTAURANTS)
-          .index("pending-updates")
-          .openCursor("yes");
-      })
-      .then(function iterateCursor(cursor) {
-        if (!cursor) return;
-
-        let restaurant = cursor.value;
-        restaurant.pendingUpdate = "no";
-        DBHelper.favoriteRestaurant(restaurant, restaurant.is_favorite);
-
-        return cursor.continue().then(iterateCursor);
-      });
-
-    // reviews
-    DBHelper.retrieveDB()
-      .then(db => {
-        if (!db) return;
-
-        return db
-          .transaction(DBHelper.STORE_REVIEWS)
-          .objectStore(DBHelper.STORE_REVIEWS)
-          .index("pending-updates")
-          .openCursor("yes");
-      })
-      .then(function iterateCursor(cursor) {
-        if (!cursor) return;
-
-        let review = cursor.value;
-
-        DBHelper.deleteReviewFromDb(review.id, () => {
-          review.pendingUpdate = "no";
-          DBHelper.insertReview(review);
-        });
-
-        return cursor.continue().then(iterateCursor);
-      });
+    //TO-DO : write updateRestaurantInDb
   }
 
   /**
    * Fetch unsynced reviews
    */
-  static syncOfflineReviews() {
+  static syncOfflineReviewsAndPendingRestaurantUpdate() {
+    syncOfflineReviews;
+    syncRestaurantFlag;
+  }
 
+  syncOfflineReviews() {
     const db = idb
       .open(DBHelper.DB_NAME, 1)
       .then(db => {
@@ -512,39 +391,34 @@ class DBHelper {
           .getAll();
       })
       .then(allObjs => {
-        let unsychedReviews = [];
-              allObjs.forEach(item => {
-                item.reviews.forEach(review => {
-                  if (ownreview.flag) {
-                    unsychedReviews.push(review);
-                    delete review.flag;
-                  }
-                });
-              });
-              unsychedReviews.forEach(item => {
-                const body = {
-                  restaurant_id: item.restaurant_id,
-                  name: item.name,
-                  rating: item.rating,
-                  comments: item.comments,
-                  updatedAt: item.updatedAt
-                };
-                fetch(URL_REVIEWS_ALL, {
-                  method: "post",
-                  headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json"
-                  },
-                  body: JSON.stringify(body)
-                }).then(res =>
-                  console.log("review synced with the server", res.json())
-                );
-              });
-            });
-
+        let unsyncedReviews = [];
+        allObjs.forEach(item => {
+          item.reviews.forEach(review => {
+            if (review.toBeUpdated) {
+              unsyncedReviews.push(review);
+              delete review.toBeUpdated;
+            }
+          });
+        });
+        unsyncedReviews.forEach(item => {
+          const body = {
+            restaurant_id: item.restaurant_id,
+            name: item.name,
+            rating: item.rating,
+            comments: item.comments,
+            updatedAt: item.updatedAt
+          };
+          fetch(DBHelper.REVIEWS_URL, {
+            method: "post",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
+          }).then(res =>
+            console.log("review synced with the server", res.json())
+          );
+        });
       });
-
-    // IDBHelper.readAllIdbData(IDBHelper.dbPromise).then(allObjs => {
-    //
   }
 }

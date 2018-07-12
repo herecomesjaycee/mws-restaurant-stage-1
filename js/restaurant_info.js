@@ -55,12 +55,12 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById("restaurant-name");
   restaurant.is_favorite
     ? (name.innerHTML = restaurant.name + ` [&hearts;]`)
-    : (name.innerHTML = restaurant.name)
+    : (name.innerHTML = restaurant.name);
 
   const button = document.getElementById("favourite-button");
   restaurant.is_favorite
-    ? (button.innerHTML = 'Remove from your favourite list')
-    : (button.innerHTML = 'Add to your favourite list')
+    ? (button.innerHTML = "Remove from your favourite list")
+    : (button.innerHTML = "Add to your favourite list");
 
   const address = document.getElementById("restaurant-address");
   address.innerHTML = restaurant.address;
@@ -72,7 +72,6 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
   const cuisine = document.getElementById("restaurant-cuisine");
   cuisine.innerHTML = restaurant.cuisine_type;
-
 
   //update form for resturant id
   updateFormRestaurantId(restaurant);
@@ -109,7 +108,7 @@ fillRestaurantHoursHTML = (
 
 fillReviewsHTML = (restaurant = self.restaurant) => {
   if (self.restaurant.reviews) {
-    console.log('hi')
+    console.log("hi");
     renderReviews(self.restaurant.reviews);
   } else {
     DBHelper.fetchReviewsByRestaurantId(restaurant.id, (error, reviews) => {
@@ -151,8 +150,8 @@ renderReview = review => {
   // sort reviews by latest
   const ul = document.getElementById("reviews-list"),
     fragment = document.createDocumentFragment();
-    fragment.append(createReviewHTML(review));
-    ul.appendChild(fragment);
+  fragment.append(createReviewHTML(review));
+  ul.appendChild(fragment);
 };
 /**
  * Create review HTML and add it to the webpage.
@@ -241,6 +240,7 @@ postReview = () => {
 
 resetReviewForm = () => {
   document.getElementById("review-form").reset();
-  document.getElementById("review-notice").innerHTML = 'Thank you for your review!'
-  document.getElementById("review-notice").classList.add('review-notice-style')
-}
+  document.getElementById("review-notice").innerHTML =
+    "Thank you for your review!";
+  document.getElementById("review-notice").classList.add("review-notice-style");
+};
