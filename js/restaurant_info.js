@@ -231,7 +231,8 @@ postReview = () => {
     rating: parseInt(rating),
     comments: comments,
     restaurant_id: parseInt(restaurant_id),
-    createdAt: Date.now()
+    createdAt: Date.now(),
+    updatedAt: Date.now()
   };
   DBHelper.postReview(review);
   renderReview(review);

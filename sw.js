@@ -14,6 +14,10 @@ const dbPromise = idb.open("mws-restaurant", 1, upgradeDb => {
     keyPath: "id",
     autoIncrement: true
   });
+  var ReviewsStore = upgradeDb.createObjectStore("pendingReviews", {
+    keyPath: "createdAt",
+    autoIncrement: true
+  });
 });
 
 self.addEventListener("install", function(event) {
@@ -75,7 +79,7 @@ self.addEventListener("message", event => {
 });
 
 self.addEventListener("sync", event => {
-  event.waitUntil(syncOfflineReviewsAndPendingRestaurantUpdate());
+  event.waitUntil(DBHelper.syncOfflineReviewsAndPendingRestaurantUpdate());
 });
 
 function servePhoto(request) {
