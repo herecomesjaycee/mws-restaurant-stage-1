@@ -79,7 +79,9 @@ self.addEventListener("message", event => {
 });
 
 self.addEventListener("sync", event => {
-  event.waitUntil(DBHelper.syncOfflineReviewsAndPendingRestaurantUpdate());
+  if (event.tag == "syncReview") {
+    event.waitUntil(DBHelper.syncOfflineReviewsAndPendingRestaurantUpdate());
+  }
 });
 
 function servePhoto(request) {

@@ -27,6 +27,12 @@ class DBHelper {
     return "reviews";
   }
   /**
+   * Indexed db store.reviews
+   */
+  static get PENDING_REVIEWS_STORE() {
+    return "pendingReviews";
+  }
+  /**
    * Database URL.
    * Change this to restaurants.json file location on your server.
    */
@@ -93,34 +99,30 @@ class DBHelper {
         // Examine the text in the response
         response.json().then(function(data) {
           const restaurants = data;
-          const request = indexedDB.open(DBHelper.DB_NAME, 1);
-          request.onsuccess = function(event) {
-            const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
-              const tx = db.transaction(
-                DBHelper.RESTAURANTS_STORE,
-                "readwrite"
-              );
-              restaurants.forEach(function(restaurant) {
-                let obj = {};
-                for (var p in restaurant) {
-                  obj[p] = restaurant[p];
-                }
-                tx.objectStore(DBHelper.RESTAURANTS_STORE).put({
-                  id: restaurant.id,
-                  data: obj
-                });
-                return tx.complete;
+          const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
+            const tx = db.transaction(DBHelper.RESTAURANTS_STORE, "readwrite");
+            restaurants.forEach(function(restaurant) {
+              let obj = {};
+              for (var p in restaurant) {
+                obj[p] = restaurant[p];
+              }
+              tx.objectStore(DBHelper.RESTAURANTS_STORE).put({
+                id: restaurant.id,
+                data: obj
               });
+              return tx.complete;
             });
-          };
+          });
           callback(null, restaurants);
         });
       })
       .catch(function(err) {
         console.log("Fetch Error :-S", err);
-        return db
-          .transaction(DBHelper.DB_NAME)
-          .objectStore(DBHelper.RESTAURANTS_STORE);
+        const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
+          const tx = db.transaction(DBHelper.RESTAURANTS_STORE, "readwrite");
+          tx.objectStore(DBHelper.RESTAURANTS_STORE).getAll();
+          return tx.complete;
+        });
       });
   }
 
@@ -335,7 +337,6 @@ class DBHelper {
         return response.json();
       })
       .then(review => {
-        review.toBeUpdated = true;
         const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
           const tx = db.transaction(DBHelper.REVIEWS_STORE, "readwrite");
           tx.objectStore(DBHelper.REVIEWS_STORE).put({
@@ -347,7 +348,17 @@ class DBHelper {
       })
       .catch(err => {
         console.error(err);
-        return review;
+        const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
+          const tx = db.transaction(
+            DBHelper.PENDING_REVIEWS_STORE,
+            "readwrite"
+          );
+          tx.objectStore(DBHelper.PENDING_REVIEWS_STORE).put({
+            createdAt: review.createdAt,
+            data: review
+          });
+          return tx.complete;
+        });
       });
     return review;
   }
@@ -377,27 +388,31 @@ class DBHelper {
    * Fetch unsynced reviews
    */
   static syncOfflineReviewsAndPendingRestaurantUpdate() {
-    syncOfflineReviews;
-    syncRestaurantFlag;
+    DBHelper.syncOfflineReviews();
+    DBHelper.syncPendingRestaurantUpdate();
   }
 
-  syncOfflineReviews() {
+  static syncOfflineReviews() {
+    console.log("trying to sync offline");
     const db = idb
       .open(DBHelper.DB_NAME, 1)
       .then(db => {
         return db
-          .transaction("reviews")
-          .objectStore("reviews")
+          .transaction(DBHelper.PENDING_REVIEWS_STORE)
+          .objectStore(DBHelper.PENDING_REVIEWS_STORE)
           .getAll();
       })
       .then(allObjs => {
         let unsyncedReviews = [];
         allObjs.forEach(item => {
-          item.reviews.forEach(review => {
-            if (review.toBeUpdated) {
-              unsyncedReviews.push(review);
-              delete review.toBeUpdated;
-            }
+          item.data.forEach(review => {
+            unsyncedReviews.push(review);
+            const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
+              return db
+                .transaction(DBHelper.PENDING_REVIEWS_STORE)
+                .objectStore(DBHelper.PENDING_REVIEWS_STORE)
+                .delete(review.createdAt);
+            });
           });
         });
         unsyncedReviews.forEach(item => {
@@ -421,4 +436,6 @@ class DBHelper {
         });
       });
   }
+
+  static syncPendingRestaurantUpdate() {}
 }
