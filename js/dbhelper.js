@@ -57,35 +57,6 @@ class DBHelper {
   }
 
   /**
-   * Get indexed database promise
-   */
-  static retrieveDB() {
-    return idb.open(DBHelper.DB_NAME, DBHelper.DB_VER, upgrade => {
-      const storeRestaurants = upgrade.createObjectStore(
-        DBHelper.RESTAURANTS_STORE,
-        {
-          keyPath: "id",
-          autoIncrement: true
-        }
-      );
-      // values for pendingUpdate 'yes', 'no' are used instead of boolean because IndexedDb doesn't support index on boolean column
-      // due to many possible 'falsy' values
-      storeRestaurants.createIndex("pending-updates", "pendingUpdate", {
-        unique: false
-      });
-
-      const storeReviews = upgrade.createObjectStore(DBHelper.REVIEWS_STORE, {
-        keyPath: "id",
-        autoIncrement: true
-      });
-
-      storeReviews.createIndex("pending-updates", "pendingUpdate", {
-        unique: false
-      });
-    });
-  }
-
-  /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
@@ -117,12 +88,17 @@ class DBHelper {
         });
       })
       .catch(function(err) {
-        console.log("Fetch Error :-S", err);
-        const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
-          const tx = db.transaction(DBHelper.RESTAURANTS_STORE, "readwrite");
-          tx.objectStore(DBHelper.RESTAURANTS_STORE).getAll();
-          return tx.complete;
-        });
+        const db = idb
+          .open(DBHelper.DB_NAME, 1)
+          .then(db => {
+            return db
+              .transaction(DBHelper.RESTAURANTS_STORE)
+              .objectStore(DBHelper.RESTAURANTS_STORE)
+              .getAll();
+          })
+          .then(allObjs => {
+            return allObjs;
+          });
       });
   }
 
@@ -348,6 +324,7 @@ class DBHelper {
       })
       .catch(err => {
         console.error(err);
+        console.log;
         const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
           const tx = db.transaction(
             DBHelper.PENDING_REVIEWS_STORE,
@@ -404,25 +381,26 @@ class DBHelper {
       })
       .then(allObjs => {
         let unsyncedReviews = [];
-        allObjs.forEach(item => {
-          item.data.forEach(review => {
-            unsyncedReviews.push(review);
-            const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
-              return db
-                .transaction(DBHelper.PENDING_REVIEWS_STORE)
-                .objectStore(DBHelper.PENDING_REVIEWS_STORE)
-                .delete(review.createdAt);
-            });
+        allObjs.forEach(review => {
+          unsyncedReviews.push(review);
+          const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
+            return db
+              .transaction(DBHelper.PENDING_REVIEWS_STORE, "readwrite")
+              .objectStore(DBHelper.PENDING_REVIEWS_STORE)
+              .delete(review.createdAt);
           });
         });
-        unsyncedReviews.forEach(item => {
+        unsyncedReviews.forEach(review => {
+          console.log(review);
           const body = {
-            restaurant_id: item.restaurant_id,
-            name: item.name,
-            rating: item.rating,
-            comments: item.comments,
-            updatedAt: item.updatedAt
+            restaurant_id: review.data.restaurant_id,
+            name: review.data.name,
+            rating: review.data.rating,
+            comments: review.data.comments,
+            updatedAt: review.data.updatedAt,
+            createdAt: review.createdAt
           };
+          console.log(body);
           fetch(DBHelper.REVIEWS_URL, {
             method: "post",
             headers: {
@@ -430,9 +408,9 @@ class DBHelper {
               "Content-Type": "application/json"
             },
             body: JSON.stringify(body)
-          }).then(res =>
-            console.log("review synced with the server", res.json())
-          );
+          }).then(response => {
+            console.log(response.json());
+          });
         });
       });
   }

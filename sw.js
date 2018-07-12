@@ -6,6 +6,7 @@ const staticImgsCache = "restaurant-content-imgs";
 const allCacheNames = [staticCacheName, staticImgsCache];
 
 const dbPromise = idb.open("mws-restaurant", 1, upgradeDb => {
+  console.log("building idb stores");
   var restaurantsStore = upgradeDb.createObjectStore("restaurants", {
     keyPath: "id",
     autoIncrement: true
@@ -79,7 +80,7 @@ self.addEventListener("message", event => {
 });
 
 self.addEventListener("sync", event => {
-  if (event.tag == "syncReview") {
+  if (event.tag == "syncUpdates") {
     event.waitUntil(DBHelper.syncOfflineReviewsAndPendingRestaurantUpdate());
   }
 });
