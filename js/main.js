@@ -5,9 +5,11 @@ var markers = [];
  * Fetch neighborhoods and cuisines and favourite as soon as the page is loaded.
  */
 window.onload = () => {
+  createObserver();
   fetchNeighborhoods();
   fetchCuisines();
   fetchFavourites();
+  addMarkersToMap();
 };
 
 /**
@@ -133,7 +135,7 @@ updateRestaurants = () => {
         console.error(error);
       } else {
         resetRestaurants(restaurants);
-        fillRestaurantsHTML();
+        fillFirstRestaurantHTML();
       }
     }
   );
@@ -157,12 +159,9 @@ resetRestaurants = restaurants => {
 /**
  * Create all restaurants HTML and add them to the webpage.
  */
-fillRestaurantsHTML = (restaurants = self.restaurants) => {
+fillFirstRestaurantHTML = (restaurants = self.restaurants) => {
   const ul = document.getElementById("restaurants-list");
-  restaurants.forEach(restaurant => {
-    ul.append(createRestaurantHTML(restaurant));
-  });
-  addMarkersToMap();
+  ul.append(createRestaurantHTML(restaurants[0]))
 };
 
 /**
@@ -170,6 +169,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
  */
 createRestaurantHTML = restaurant => {
   const li = document.createElement("li");
+  li.id = `restaurants-${restaurant.id}`;
 
   const image = document.createElement("img");
   image.className = "restaurant-img";
@@ -179,7 +179,7 @@ createRestaurantHTML = restaurant => {
 
   const image_link = document.createElement("a");
   image_link.id = "link-wrapper";
-  image_link.innerHTML = `<img class=${image.classList} src=${image.src} data-src=${image_url} alt=${image.alt}>`;
+  image_link.innerHTML = `<img class=${image.classList} src=${image_url} alt=${image.alt}>`;
   image_link.href = DBHelper.urlForRestaurant(restaurant);
   li.append(image_link);
 
@@ -220,31 +220,26 @@ addMarkersToMap = (restaurants = self.restaurants) => {
   });
 };
 
-/** Lazy loading **/
-window.addEventListener(
-  "load",
-  function() {
-    var allimages = document.getElementsByClassName("restaurant-img");
-    for (var i = 0; i < allimages.length; i++) {
-      allimages[i].setAttribute("src", allimages[i].getAttribute("data-src"));
-    }
-  },
-  false
-);
+createObserver = () => {
+  let observer;
 
-var options = {
-  root: document.querySelector('#maincontent'),
-  rootMargin: '0px',
-  threshold: 1.0
+  const options = {
+    root: document.querySelector('#restaurants-list'),
+    rootMargin: '0px',
+    threshold: 1
+  }
+  observer = new IntersectionObserver(loadRestofRestaurants, options);
+  const target = document.querySelector('#restaurants-1');
+  observer.observe(target);
 }
 
-var observer = new IntersectionObserver(callback, options);
-
-var target = document.querySelector('#restaurants-list');
-observer.observe(target);
-
-var callback = function(entries, observer) {
-  entries.forEach(entry => {
-    fillRestaurantsHTML()
+loadRestofRestaurants = () => {
+  console.log('loading rest of restaurant')
+  fetchRestaurants();
+  const ul = document.getElementById("restaurants-list");
+  self.restaurants.shift()
+  self.restaurants.forEach(restaurant => {
+    ul.append(createRestaurantHTML(restaurant));
   });
-};
+}
+
