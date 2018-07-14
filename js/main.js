@@ -231,3 +231,20 @@ window.addEventListener(
   },
   false
 );
+
+var options = {
+  root: document.querySelector('#maincontent'),
+  rootMargin: '0px',
+  threshold: 1.0
+}
+
+var observer = new IntersectionObserver(callback, options);
+
+var target = document.querySelector('#restaurants-list');
+observer.observe(target);
+
+var callback = function(entries, observer) {
+  entries.forEach(entry => {
+    fillRestaurantsHTML()
+  });
+};
