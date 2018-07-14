@@ -25,11 +25,6 @@ window.initMap = () => {
  * Get current restaurant from page URL.
  */
 fetchRestaurantFromURL = callback => {
-  if (self.restaurant) {
-    // restaurant already fetched!
-    callback(null, self.restaurant);
-    return;
-  }
   const id = getParameterByName("id");
   if (!id) {
     // no id found in URL
@@ -42,7 +37,7 @@ fetchRestaurantFromURL = callback => {
         console.error(error);
         return;
       }
-      fillRestaurantHTML();
+      fillRestaurantHTML(restaurant);
       callback(null, restaurant);
     });
   }
@@ -52,15 +47,8 @@ fetchRestaurantFromURL = callback => {
  * Create restaurant HTML and add it to the webpage
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
-  const name = document.getElementById("restaurant-name");
-  restaurant.is_favorite
-    ? (name.innerHTML = restaurant.name + ` [&hearts;]`)
-    : (name.innerHTML = restaurant.name);
-
-  const button = document.getElementById("favourite-button");
-  restaurant.is_favorite
-    ? (button.innerHTML = "Remove from your favourite list")
-    : (button.innerHTML = "Add to your favourite list");
+  //fill restaurant name
+  fillRestaurantName();
 
   const address = document.getElementById("restaurant-address");
   address.innerHTML = restaurant.address;
@@ -73,17 +61,25 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const cuisine = document.getElementById("restaurant-cuisine");
   cuisine.innerHTML = restaurant.cuisine_type;
 
-  //update form for resturant id
+  //update form for restaurant id
   updateFormRestaurantId(restaurant);
 
   // fill operating hours
   if (restaurant.operating_hours) {
     fillRestaurantHoursHTML();
   }
+  // fill favourite button
+  fillFavouriteButton();
   // fill reviews
   fillReviewsHTML();
 };
 
+fillRestaurantName = (restaurant = self.restaurant) => {
+  const name = document.getElementById("restaurant-name");
+  restaurant.is_favorite == true || restaurant.is_favorite == "true"
+    ? (name.innerHTML = restaurant.name + ` [&hearts;]`)
+    : (name.innerHTML = restaurant.name);
+}
 /**
  * Create restaurant operating hours HTML table and add it to the webpage.
  */
@@ -105,6 +101,13 @@ fillRestaurantHoursHTML = (
     hours.appendChild(row);
   }
 };
+
+fillFavouriteButton = (restaurant = self.restaurant) => {
+  const button = document.getElementById("favourite-button");
+  restaurant.is_favorite == true || restaurant.is_favorite == "true"
+    ? (button.innerHTML = "Remove from your favourite list")
+    : (button.innerHTML = "Add to your favourite list");
+}
 
 fillReviewsHTML = (restaurant = self.restaurant) => {
   if (self.restaurant.reviews) {
@@ -159,7 +162,7 @@ renderReview = review => {
 createReviewHTML = review => {
   const li = document.createElement("li");
   const name = document.createElement("p");
-  name.innerHTML = review.name;
+  name.innerHTML = review.name || "Anomynous Reviewer";
   li.appendChild(name);
 
   const date = document.createElement("p");
@@ -171,7 +174,7 @@ createReviewHTML = review => {
   li.appendChild(rating);
 
   const comments = document.createElement("p");
-  comments.innerHTML = review.comments;
+  comments.innerHTML = review.comments || "No Comment";
   li.appendChild(comments);
 
   return li;
@@ -211,12 +214,16 @@ updateFormRestaurantId = restaurant => {
  * @param {Object} restaurant
  */
 favoriteRestaurant = (restaurant = self.restaurant) => {
-  if (restaurant.is_favorite) {
+  if (restaurant.is_favorite == true || restaurant.is_favorite == "true" ) {
     DBHelper.favoriteRestaurant(restaurant, false);
-    fillRestaurantHTML();
+    restaurant.is_favorite = false;
+    fillFavouriteButton(restaurant);
+    fillRestaurantName(restaurant);
   } else {
     DBHelper.favoriteRestaurant(restaurant, true);
-    fillRestaurantHTML();
+    restaurant.is_favorite = true;
+    fillFavouriteButton(restaurant);
+    fillRestaurantName(restaurant);
   }
 };
 

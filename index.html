@@ -5,17 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta tag="utf-8" charset="utf-8">
   <meta name="theme-color" content="#252831"/>
-  <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
-  <link rel="stylesheet" href="css/styles.css">
+  <meta http-equiv="Cache-control" content="public">
+  <link rel="stylesheet" src="//normalize-css.googlecode .com/svn/trunk/normalize.css" />
   <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="http://localhost:1337">
   <title>Restaurant Reviews</title>
 </head>
 <style>
-
-  * {
-    box-sizing: border-box;
-  }
-
   body,
   td,
   th,
@@ -130,7 +127,43 @@
     text-align: center;
     text-transform: uppercase;
   }
+  /* ====================== Map ====================== */
+  #map {
+    height: 30vh;
+    width: 100%;
+  }
 
+  /* ====================== Restaurant Filtering ====================== */
+  .filter-options {
+    width: 100%;
+    height: 100%;
+    background-color: #252831;
+    padding-left: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    box-sizing: border-box;
+  }
+
+  .filter-options h2 {
+    color: white;
+    font-size: 1rem;
+    font-weight: 900;
+    line-height: 1;
+    margin: 0;
+  }
+
+  .filter-options select {
+    background-color: white;
+    border: 1px solid #fff;
+    font-family: Arial, sans-serif;
+    font-size: 11pt;
+    height: 35px;
+    letter-spacing: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 0 10px;
+    width: 200px;
+  }
   /* ====================== Navigation ====================== */
   nav {
     width: 100%;
@@ -190,6 +223,183 @@
     font-weight: 700;
     text-decoration: none;
   }
+
+  /* ====================== Restaurant Listing ====================== */
+  #restaurants-list {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    background-color: #d6d6d6;
+    list-style: outside none none;
+    margin: auto;
+    padding-top: 15px;
+    text-align: center;
+  }
+
+  #restaurants-list li {
+    background-color: #fff;
+    border: 2px solid #ccc;
+    font-family: Arial, sans-serif;
+    margin: 15px;
+    padding: 25px;
+    text-align: left;
+    max-width: 100%;
+    border-radius: 25px 0 25px 0;
+  }
+
+  #restaurants-list .restaurant-img {
+    display: block;
+    margin: 1em;
+    max-width: 90%;
+    min-width: 80%;
+    min-height: 40vh;
+    max-height: 60vh;
+    border-radius: 25px 0 25px 0;
+    border: 5px dotted orange;
+  }
+
+  #restaurants-list li h3 {
+    color: #005959;
+    font-family: Arial, sans-serif;
+    font-size: 14pt;
+    font-weight: 800;
+    letter-spacing: 0;
+    line-height: 1.3;
+    margin: 20px 0 10px;
+    text-transform: uppercase;
+  }
+
+  #restaurants-list p {
+    margin: 1em;
+    font-size: 12pt;
+  }
+
+  #link-wrapper {
+    background-color: transparent;
+  }
+
+  #view-details {
+    color: #000;
+    display: inline-block;
+    margin: 1em;
+    background-color: orange;
+    font-size: 10pt;
+    padding: 8px 30px 10px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  /* ========================= MEDIA QUERIES ========================= */
+  /* small device portrait*/
+  @media (max-width: 600px) {
+    nav h1 a {
+      font-size: 16pt;
+    }
+
+    #breadcrumb li,
+    .name-date-wrapper .name,
+    .name-date-wrapper .date,
+    #reviews-list li .review-text {
+      font-size: 12pt;
+    }
+
+    #map {
+      height: 50vh;
+      width: 100%;
+      background-color: #000;
+    }
+
+    #restaurant-name,
+    #reviews-container h2 {
+      font-size: 14pt;
+    }
+  }
+
+  /* small device landscape */
+  @media (min-width: 601px) and (max-width: 685px) {
+    #restaurants-list li {
+      position: relative;
+      min-height: 400px;
+    }
+
+    #restaurants-list li a {
+      bottom: 15px;
+      left: 15px;
+    }
+
+    #restaurants-list li h3 {
+      font-size: 12pt;
+    }
+  }
+
+  /* medium device - portrait and landscape */
+  @media (min-width: 601px) and (max-width: 1023px) {
+    .list-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    #restaurant-container,
+    #reviews-container {
+      width: 80%;
+      margin-right: auto;
+      margin-left: auto;
+    }
+  }
+
+  /* large device */
+  @media (min-width: 1024px) {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    td {
+      font-size: 1.4em;
+    }
+
+    .list-container {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    #restaurants-list {
+      grid-template-columns: repeat(2, 1fr);
+
+      li {
+        margin: 15px;
+        padding: 10px;
+      }
+    }
+
+    #restaurant-list .inside #maincontent {
+      display: grid;
+      grid-template-columns: 50% 50%;
+      grid-template-rows: auto auto;
+      grid-template-areas: "restaurant map" "reviews map";
+    }
+
+    .inside #map {
+      height: 100%;
+      width: 100%;
+    }
+
+    .inside #map-container {
+      grid-area: map;
+      width: 100%;
+    }
+
+    #restaurant-container {
+      grid-area: restaurant;
+    }
+
+    #reviews-container {
+      grid-area: reviews;
+      max-width: 98%;
+    }
+  }
 </style>
 <body>
   <header>
@@ -217,9 +427,9 @@
         </select>
       </div>
       <ul id="restaurants-list"></ul>
-    </section>
-    <section id="map-container">
-      <div id="map" role="application" aria-label="Google Maps"></div>
+      <section id="map-container">
+        <div id="map" role="application" aria-label="Google Maps"></div>
+      </section>
     </section>
   </main>
 
@@ -241,7 +451,11 @@
   <script type="application/javascript" charset="utf-8" src="js/idb.js"></script>
   <script>
     const db = idb.open("mws-restaurant", 1, upgradeDb => {
-      console.log("building idb stores");
+      console.log("building idb stores in index");
+      var PendingUpdateStore = upgradeDb.createObjectStore("pendingUpdates", {
+        keyPath: "id",
+        autoIncrement: true
+      });
       var restaurantsStore = upgradeDb.createObjectStore("restaurants", {
         keyPath: "id",
         autoIncrement: true
@@ -256,7 +470,7 @@
       });
     })
   </script>
-  <script type="application/javascript" charset="utf-8" src="js/dbhelper.js"></script>
+  <script async defer type="application/javascript" charset="utf-8" src="js/dbhelper.js"></script>
   <script async defer type="application/javascript" charset="utf-8" src="js/main.js"></script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyByd_v_0qYbeTAUcfxYF83HXaVbCCqhHTo&libraries=places&callback=initMap"></script>
   <footer id="footer">

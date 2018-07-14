@@ -5,12 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta tag="utf-8" charset="utf-8">
   <meta name="theme-color" content="#252831"/>
+  <meta http-equiv="Cache-control" content="public">
   <!-- Normalize.css for better cross-browser consistency -->
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
   <!-- Main CSS file -->
   <link rel="stylesheet" href="css/styles.css" type="text/css">
   <link rel="stylesheet" href="css/restaurant_info.css">
   <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="http://localhost:1337">
   <title>Restaurant Info</title>
 </head>
 <style>
@@ -193,6 +196,11 @@
     font-weight: 700;
     text-decoration: none;
   }
+  /* ====================== Map ====================== */
+  #map {
+    height: 30vh;
+    width: 100%;
+  }
 </style>
 <body class="inside">
   <!-- Beginning header -->
@@ -250,7 +258,7 @@
         <br>
         <input type="text" id="name" name="name" placeholder='Jane Doe'>
         <br>
-        <label for="rating">Rating: </label>
+        <label for="rating">Rating: (required)</label>
         <br>
         <div>
             <input type="radio" id="1" name="rating" value="1"/>
@@ -299,7 +307,7 @@
    <!-- Main javascript file -->
    <script async defer type="text/javascript" src="js/restaurant_info.js"></script>
   <!-- Google Maps -->
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyByd_v_0qYbeTAUcfxYF83HXaVbCCqhHTo&libraries=places&callback=initMap"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyByd_v_0qYbeTAUcfxYF83HXaVbCCqhHTo&libraries=places&callback=initMap" async defer></script>
   <!-- End scripts -->
 
 </body>

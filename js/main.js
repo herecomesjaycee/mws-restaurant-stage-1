@@ -184,7 +184,7 @@ createRestaurantHTML = restaurant => {
   li.append(image_link);
 
   const name = document.createElement("h2");
-  restaurant.is_favorite
+  restaurant.is_favorite == true || restaurant.is_favorite == "true"
     ? (name.innerHTML = restaurant.name + ` [&hearts;]`)
     : (name.innerHTML = restaurant.name);
   li.append(name);

@@ -32,6 +32,13 @@ class DBHelper {
   static get PENDING_REVIEWS_STORE() {
     return "pendingReviews";
   }
+
+  /**
+   * Indexed db store.reviews
+   */
+  static get PENDING_RESTAURANT_UPDATE_STORE() {
+    return "pendingUpdates";
+  }
   /**
    * Database URL.
    * Change this to restaurants.json file location on your server.
@@ -218,8 +225,7 @@ class DBHelper {
           //filter by favourite
           results = results.filter(
             r =>
-              r.is_favorite == favourite ||
-              r.is_favorite == favourite.toString()
+              r.is_favorite == (true || 'true')
           );
         }
         callback(null, results);
@@ -351,14 +357,17 @@ class DBHelper {
       .then(resp => {
         if (resp.status != 200)
           console.info(`Response was not successful. Response: ${resp}`);
-        restaurant.pendingUpdate = "no";
       })
       .catch(e => {
         console.log(e);
-        restaurant.pendingUpdate = "yes";
+        const restaurantObj = {id: restaurant.id, state: state}
+        const db = idb.open(DBHelper.DB_NAME, 1).then(db => {
+          return db
+            .transaction(DBHelper.PENDING_RESTAURANT_UPDATE_STORE, "readwrite")
+            .objectStore(DBHelper.PENDING_RESTAURANT_UPDATE_STORE)
+            .put(restaurantObj);
+        });
       });
-    DBHelper.updateRestaurantInDb(restaurant);
-    //TO-DO : write updateRestaurantInDb
   }
 
   /**
@@ -370,7 +379,7 @@ class DBHelper {
   }
 
   static syncOfflineReviews() {
-    console.log("trying to sync offline");
+    console.log("trying to sync offline reviews");
     const db = idb
       .open(DBHelper.DB_NAME, 1)
       .then(db => {
@@ -415,5 +424,46 @@ class DBHelper {
       });
   }
 
-  static syncPendingRestaurantUpdate() {}
+  static syncPendingRestaurantUpdate() {
+    console.log("trying to sync offline restaurant preference");
+    const db = idb
+      .open(DBHelper.DB_NAME, 1)
+      .then(db => {
+        return db
+          .transaction(DBHelper.PENDING_RESTAURANT_UPDATE_STORE)
+          .objectStore(DBHelper.PENDING_RESTAURANT_UPDATE_STORE)
+          .getAll();
+      })
+      .then(allObjs => {
+        let unsyncedRestaurants = [];
+        allObjs.forEach(restaurantObj => {
+          unsyncedRestaurants.push(restaurantObj);
+        });
+        unsyncedRestaurants.forEach(restaurantObj => {
+          fetch(
+            `${DBHelper.RESTAURANTS_URL}${restaurantObj.id}/?is_favorite=${restaurantObj.state}`,
+            {
+              method: "PUT"
+            }
+          ).then(resp => {
+            if (resp.status != 200)
+              console.info(`Response was not successful. Response: ${resp}`);
+            const db = idb
+              .open(DBHelper.DB_NAME, 1)
+              .then(db => {
+                return db
+                  .transaction(
+                    DBHelper.PENDING_RESTAURANT_UPDATE_STORE,
+                    "readwrite"
+                  )
+                  .objectStore(DBHelper.PENDING_RESTAURANT_UPDATE_STORE)
+                  .delete(restaurant.id);
+              })
+              .catch(e => {
+                console.log(e);
+              });
+          });
+        });
+      });
+  }
 }
